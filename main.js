@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
             keycode = e.which || e.keyCode || 0;
             pressed_key = e.key;
             if (pressed_key == 'q' || pressed_key == 'w') {
+                listenkey = false;
                 disp_func();
             }
         }
@@ -205,6 +206,11 @@ function disp_none_text() {
         rAF_loop_on = false;
         store_trial();
     }, current_stim.duration);
+}
+
+function ending() {
+    full_data += jscd_text;
+    document.getElementById('dl_id').style.display = 'block';
 }
 
 function dl_as_file() {
