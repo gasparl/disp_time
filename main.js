@@ -154,7 +154,7 @@ function disp_rPAF_text() {
     requestPostAnimationFrame(function() {
         stim_starts = now();
 
-        requestAnimationFrame(function() {
+        setTimeout(function() {
 
             document.getElementById('stimulus_id').textContent = '';
             raf_times.end_before = now();
@@ -178,7 +178,7 @@ function disp_rAF_text() {
         document.getElementById('stimulus_id').textContent = current_stim.item;
         raf_times.start_call = now();
 
-        requestAnimationFrame(function() {
+        setTimeout(function() {
             raf_times.end_before = now();
 
             requestAnimationFrame(function(stamp2) {
@@ -198,7 +198,7 @@ function disp_none_text() {
     console.log('disp_none_text', neat_date());
     document.getElementById('stimulus_id').textContent = current_stim.item;
     stim_starts = now();
-    requestAnimationFrame(function() {
+    setTimeout(function() {
         document.getElementById('stimulus_id').textContent = '';
         raf_times.end_before = now();
         stim_ends = now();
@@ -208,8 +208,8 @@ function disp_none_text() {
 }
 
 function dl_as_file() {
-    filename_to_dl = 'disptime_' + this_os + '_' +
-        this_browser + '_' + stim_color + '_' + neat_date() + '.txt';
+    filename_to_dl = 'disptime_' + jscd.os + '_' +
+        jscd.browser + '_' + stim_color + '_' + neat_date() + '.txt';
     data_to_dl = full_data;
     let blobx = new Blob([data_to_dl], {
         type: 'text/plain'
