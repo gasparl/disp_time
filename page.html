@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
+    <title>JS Display Time Measure</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Gaspar Lukacs">
+    <script src="./disptime.js"></script>
+    <script src="./jscd.js"></script>
+    <script src="./main.js"></script>
+    <style>
+        .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #stimulus_id {
+            font-size: 100px;
+        }
+
+        #bg_id {
+            height: 500px;
+            width: 500px;
+            border: solid 3px blue;
+            position: relative;
+            margin: auto;
+            float: left;
+            margin: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="bg_id">
+        <canvas id="canvas_id" class="centered"></canvas>
+        <div id="stimulus_id" class="centered"></div>
+    </div>
+
+    <div>
+        <div id="btns_id">
+            <button type="button" onclick="begin('black');">start black</button>
+            <button type="button" onclick="begin('white');">start white</button>
+        </div>
+        <div id="jscd_id">...</div>
+        <br>
+        <div id="info_id">[...]</div>
+        <br>
+        <br>
+        <button id="dl_id" style="display:none;" type="button" onclick="dl_as_file();">download</button>
+    </div>
+
+</body>
+
+</html>
