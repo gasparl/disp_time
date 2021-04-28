@@ -4,7 +4,7 @@
  * JavaScript Client Detection
  * (C) viazenetti GmbH (Christian Ludwig)
  */
- 
+
 (function (window) {
     {
         var unknown = '-';

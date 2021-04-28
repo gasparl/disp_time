@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     jscd_text = 'client\t' + heads.join('/') + '\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
     document.body.addEventListener('keydown', function(e) {
-        input_time = now();
+        input_time = DT.now();
         if (listenkey) {
             keycode = e.which || e.keyCode || 0;
             pressed_key = e.key;
@@ -80,7 +80,8 @@ function next_trial() {
     current_stim = allstims.shift();
     console.log(current_stim);
     document.getElementById('info_id').innerHTML =
-        'Item: <b>' + current_stim.item +
+        'Current trial: <b>' + trialnum + '</b> (' + allstims.length +
+        ' left)<br>Item: <b>' + current_stim.item +
         '</b><br>Type: <b>' + current_stim.type +
         '</b><br>Duration: <b>' + current_stim.duration +
         '</b><br>Timer: <b>' + current_stim.timer +
@@ -151,16 +152,16 @@ function store_trial() {
 function disp_rPAF_text() {
     console.log('disp_rPAF_text', neat_date());
     document.getElementById('stimulus_id').textContent = current_stim.item;
-    raf_times.start_before = now();
+    raf_times.start_before = DT.now();
     requestPostAnimationFrame(function() {
-        stim_starts = now();
+        stim_starts = DT.now();
 
         setTimeout(function() {
 
             document.getElementById('stimulus_id').textContent = '';
-            raf_times.end_before = now();
+            raf_times.end_before = DT.now();
             requestPostAnimationFrame(function() {
-                stim_ends = now();
+                stim_ends = DT.now();
                 rAF_loop_on = false;
                 store_trial();
             });
@@ -172,20 +173,20 @@ function disp_rPAF_text() {
 
 function disp_rAF_text() {
     console.log('disp_rAF_text', neat_date());
-    raf_times.start_before = now();
+    raf_times.start_before = DT.now();
 
     requestAnimationFrame(function(stamp) {
         stim_starts = stamp;
         document.getElementById('stimulus_id').textContent = current_stim.item;
-        raf_times.start_call = now();
+        raf_times.start_call = DT.now();
 
         setTimeout(function() {
-            raf_times.end_before = now();
+            raf_times.end_before = DT.now();
 
             requestAnimationFrame(function(stamp2) {
                 stim_ends = stamp2;
                 document.getElementById('stimulus_id').textContent = '';
-                raf_times.end_call = now();
+                raf_times.end_call = DT.now();
                 rAF_loop_on = false;
                 store_trial();
             });
@@ -198,11 +199,11 @@ function disp_rAF_text() {
 function disp_none_text() {
     console.log('disp_none_text', neat_date());
     document.getElementById('stimulus_id').textContent = current_stim.item;
-    stim_starts = now();
+    stim_starts = DT.now();
     setTimeout(function() {
         document.getElementById('stimulus_id').textContent = '';
-        raf_times.end_before = now();
-        stim_ends = now();
+        raf_times.end_before = DT.now();
+        stim_ends = DT.now();
         rAF_loop_on = false;
         store_trial();
     }, current_stim.duration);
@@ -215,7 +216,7 @@ function ending() {
 
 function dl_as_file() {
     filename_to_dl = 'disptime_' + jscd.os + '_' +
-        jscd.browser + '_' + stim_color + '_' + neat_date() + '.txt';
+        jscd.browser + '_' + stim_color + '_' + date_time + '.txt';
     data_to_dl = full_data;
     let blobx = new Blob([data_to_dl], {
         type: 'text/plain'
