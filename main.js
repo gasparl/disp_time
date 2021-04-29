@@ -1,5 +1,10 @@
 /*jshint esversion: 6 */
 
+let date_time, jscd_text, listenkey, text_to_show, raf_times,
+    stim_color, input_time, stim_starts, stim_ends, pressed_key, keycode;
+let trialnum = 0;
+let startclicked = false;
+
 document.addEventListener("DOMContentLoaded", function() {
     let heads = ["os", "os_v", "browser", "browser_v", "screen"];
     let cols = [jscd.os, jscd.osVersion, jscd.browser, jscd.browserVersion, jscd.screen];
@@ -14,17 +19,20 @@ document.addEventListener("DOMContentLoaded", function() {
         if (listenkey) {
             keycode = e.which || e.keyCode || 0;
             pressed_key = e.key;
-            if (pressed_key == 'q' || pressed_key == 'w') {
+            if (pressed_key == 'q') {
                 listenkey = false;
                 disp_func();
+            }
+        } else if (startclicked) {
+            keycode = e.which || e.keyCode || 0;
+            pressed_key = e.key;
+            if (pressed_key == 'x') {
+                next_trial();
+                startclicked = false;
             }
         }
     });
 });
-
-let date_time, jscd_text, listenkey, text_to_show, raf_times,
-    stim_color, input_time, stim_starts, stim_ends, pressed_key, keycode;
-let trialnum = 0;
 
 function begin(colr) {
     stim_color = colr;
@@ -34,13 +42,13 @@ function begin(colr) {
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
     stim_gen();
-    next_trial();
+    startclicked = true;
 }
 
 function stim_gen() {
     let times = 10;
     let durs = [16.66, 50, 150, 300, 500];
-    let timers = ['rpaf', 'raf', 'none'];
+    let timers = ['rpaf1', 'rpaf2', 'rpaf_loop', 'raf1', 'raf2', 'raf_loop', 'none'];
     let types = {
         'text': Array(times).fill('■'),
         'img_canvas': Array(times).fill('_'),
@@ -89,11 +97,14 @@ function next_trial() {
     setTimeout(function() {
         if (current_stim.timer == 'rpaf') {
             disp_func = disp_rPAF_text;
-            rAF_loop();
+            DT.loopOn();
         } else if (current_stim.timer == 'raf') {
             disp_func = disp_rAF_text;
-        } else {
+        } else if (current_stim.timer == 'raf') {
             disp_func = disp_none_text;
+        } else {
+            console.error('No display function found');
+            store_trial();
         }
         setTimeout(function() {
             listenkey = true;
@@ -101,68 +112,22 @@ function next_trial() {
     }, 100);
 }
 
-let full_data = [
-    "datetime",
-    "trial_number",
-    "stimulus",
-    "type",
-    "duration",
-    "timer",
-    "t_input",
-    "t_disp_start",
-    "t_disp_end",
-    "pressed_key",
-    "key_code",
-    "raf_start_before",
-    "raf_start_call",
-    "raf_end_before",
-    "raf_end_call"
-].join('\t') + '\n';
+// display functions
 
-function store_trial() {
-    full_data += [
-        date_time,
-        trialnum,
-        current_stim.item,
-        current_stim.type,
-        current_stim.duration,
-        current_stim.timer,
-        input_time,
-        stim_starts,
-        stim_ends,
-        pressed_key,
-        keycode,
-        raf_times.start_before || 'na',
-        raf_times.start_call || 'na',
-        raf_times.end_before || 'na',
-        raf_times.end_call || 'na'
-    ].join('\t') + '\n';
-    input_time = 'na';
-    stim_starts = 'na';
-    stim_ends = 'na';
-    pressed_key = 'na';
-    keycode = 'na';
-    if (allstims.length > 0) {
-        next_trial();
-    } else {
-        ending();
-    }
-}
-
-function disp_rPAF_text() {
+function disp_rPAF1_text() {
     console.log('disp_rPAF_text', neat_date());
     document.getElementById('stimulus_id').textContent = current_stim.item;
     raf_times.start_before = DT.now();
-    requestPostAnimationFrame(function() {
+    DT.rPAF1(function() {
         stim_starts = DT.now();
 
         setTimeout(function() {
 
             document.getElementById('stimulus_id').textContent = '';
             raf_times.end_before = DT.now();
-            requestPostAnimationFrame(function() {
+            DT.rPAF1(function() {
                 stim_ends = DT.now();
-                rAF_loop_on = false;
+                DT.loopOff();
                 store_trial();
             });
 
@@ -171,23 +136,23 @@ function disp_rPAF_text() {
     });
 }
 
-function disp_rAF_text() {
+function disp_rAF1_text() {
     console.log('disp_rAF_text', neat_date());
     raf_times.start_before = DT.now();
 
     requestAnimationFrame(function(stamp) {
-        stim_starts = stamp;
         document.getElementById('stimulus_id').textContent = current_stim.item;
-        raf_times.start_call = DT.now();
+        stim_starts = DT.now();
+        raf_times.start_stamp = stamp;
 
         setTimeout(function() {
             raf_times.end_before = DT.now();
 
             requestAnimationFrame(function(stamp2) {
-                stim_ends = stamp2;
                 document.getElementById('stimulus_id').textContent = '';
-                raf_times.end_call = DT.now();
-                rAF_loop_on = false;
+                raf_times.end_stamp = stamp2;
+                stim_ends = DT.now();
+                DT.loopOff();
                 store_trial();
             });
 
@@ -204,9 +169,58 @@ function disp_none_text() {
         document.getElementById('stimulus_id').textContent = '';
         raf_times.end_before = DT.now();
         stim_ends = DT.now();
-        rAF_loop_on = false;
         store_trial();
     }, current_stim.duration);
+}
+
+// store
+
+let full_data = [
+    "datetime",
+    "trial_number",
+    "stimulus",
+    "type",
+    "duration",
+    "timer",
+    "t_input",
+    "t_disp_start",
+    "t_disp_end",
+    "pressed_key",
+    "key_code",
+    "raf_start_before",
+    "raf_start_stamp",
+    "raf_end_before",
+    "raf_end_stamp"
+].join('\t') + '\n';
+
+function store_trial() {
+    full_data += [
+        date_time,
+        trialnum,
+        current_stim.item,
+        current_stim.type,
+        current_stim.duration,
+        current_stim.timer,
+        input_time,
+        stim_starts,
+        stim_ends,
+        pressed_key,
+        keycode,
+        raf_times.start_before || 'na',
+        raf_times.start_stamp || 'na',
+        raf_times.end_before || 'na',
+        raf_times.end_stamp || 'na'
+    ].join('\t') + '\n';
+    input_time = 'na';
+    stim_starts = 'na';
+    stim_ends = 'na';
+    pressed_key = 'na';
+    keycode = 'na';
+    if (allstims.length > 0) {
+        next_trial();
+    } else {
+        ending();
+    }
 }
 
 function ending() {

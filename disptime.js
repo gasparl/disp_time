@@ -56,6 +56,9 @@ const DT = {
     rPAF2: function(callback) {
         requestAnimationFrame(() => this.rPAF2(callback));
     },
+    rPAF3: function(callback) {
+        requestAnimationFrame(() => requestAnimationFrame(() => this.rPAF2(callback)));
+    },
     loop: true,
     loopOn: undefined,
     loopOff: function() {
