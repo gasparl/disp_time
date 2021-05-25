@@ -18,17 +18,18 @@
         }
 
         #stimulus_id {
-            font-size: 100px;
+            font-size: 400px;
         }
 
         #bg_id {
             height: 500px;
             width: 500px;
             border: solid 3px blue;
-            position: relative;
-            margin: auto;
-            float: left;
-            margin: 100px;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     </style>
 </head>
@@ -36,7 +37,7 @@
 <body>
 
     <div id="bg_id">
-        <canvas id="canvas_id" class="centered"></canvas>
+        <canvas id="canvas_id" width="400" height="400" class="centered"></canvas>
         <div id="stimulus_id" class="centered"></div>
     </div>
 

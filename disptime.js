@@ -20,7 +20,7 @@ const DT = {
         })();
         return performance.now();
     },
-    rPAF1: (function() {
+    rPAF: (function() {
         if (typeof requestPostAnimationFrame === 'function') {
             return (requestPostAnimationFrame);
         } else {
@@ -53,24 +53,25 @@ const DT = {
             });
         }
     })(),
-    rPAF2: function(callback) {
-        requestAnimationFrame(() => this.rPAF2(callback));
+    loop: false,
+    loopFunction: undefined,
+    loopOn: function(warn = true) {
+        if (warn) {
+            console.warn('loopOn()');
+        }
+        this.loop = true;
+        this.loopFunction();
     },
-    rPAF3: function(callback) {
-        requestAnimationFrame(() => requestAnimationFrame(() => this.rPAF2(callback)));
-    },
-    loop: true,
-    loopOn: undefined,
-    loopOff: function() {
+    loopOff: function(warn = true) {
+        if (warn) {
+            console.warn('loopOff()');
+        }
         this.loop = false;
     }
 };
 
-DT.loopOn = function() {
+DT.loopFunction = function() {
     if (DT.loop) {
-        requestAnimationFrame(DT.loopOn);
-        console.log('ON2');
-    } else {
-        DT.loop = true;
+        requestAnimationFrame(DT.loopFunction);
     }
 };

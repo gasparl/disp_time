@@ -1,7 +1,8 @@
 /*jshint esversion: 6 */
 
 let date_time, jscd_text, listenkey, text_to_show, raf_times,
-    stim_color, input_time, stim_starts, stim_ends, pressed_key, keycode;
+    stim_color, input_time, stim_starts, stim_ends, pressed_key, keycode,
+    disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
 
@@ -14,6 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
     date_time = neat_date();
     jscd_text = 'client\t' + heads.join('/') + '\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
+    canvas = document.getElementById('canvas_id');
+    ctx = canvas.getContext('2d');
     document.body.addEventListener('keydown', function(e) {
         input_time = DT.now();
         if (listenkey) {
@@ -38,6 +41,7 @@ function begin(colr) {
     stim_color = colr;
     if (stim_color == 'white') {
         document.getElementById('stimulus_id').style.color = "white";
+        ctx.fillStyle = "white";
         document.getElementById('bg_id').style.backgroundColor = "black";
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
@@ -48,7 +52,10 @@ function begin(colr) {
 function stim_gen() {
     let times = 10;
     let durs = [16.66, 50, 150, 300, 500];
-    let timers = ['rpaf1', 'rpaf2', 'rpaf_loop', 'raf1', 'raf2', 'raf_loop', 'none'];
+    let timers = [
+        'rpaf1', 'rpaf2', 'rpaf3', 'rpaf_loop',
+        'raf1', 'raf2', 'raf3', 'raf_loop', 'none'
+    ];
     let types = {
         'text': Array(times).fill('■'),
         'img_canvas': Array(times).fill('_'),
@@ -60,7 +67,8 @@ function stim_gen() {
 
     // TODO: remove
     types = {
-        'text': Array(times).fill('■')
+        'text': Array(times).fill('■'),
+        'img_canvas': Array(times).fill('_')
     };
 
     allstims = [];
@@ -94,13 +102,27 @@ function next_trial() {
         '</b><br>Duration: <b>' + current_stim.duration +
         '</b><br>Timer: <b>' + current_stim.timer +
         '</b><br>Color: <b>' + stim_color + '</b>';
+    DT.loopOff();
     setTimeout(function() {
-        if (current_stim.timer == 'rpaf') {
-            disp_func = disp_rPAF_text;
+        if (current_stim.timer == 'raf1') {
+            disp_func = disp_rAF1_text;
+        } else if (current_stim.timer == 'raf2') {
+            disp_func = disp_rAF2_text;
+        } else if (current_stim.timer == 'raf3') {
+            disp_func = disp_rAF3_text;
+        } else if (current_stim.timer == 'raf_loop') {
+            disp_func = disp_rAF1_text;
             DT.loopOn();
-        } else if (current_stim.timer == 'raf') {
-            disp_func = disp_rAF_text;
-        } else if (current_stim.timer == 'raf') {
+        } else if (current_stim.timer == 'rpaf1') {
+            disp_func = disp_rPAF1_text;
+        } else if (current_stim.timer == 'rpaf2') {
+            disp_func = disp_rPAF2_text;
+        } else if (current_stim.timer == 'rpaf3') {
+            disp_func = disp_rPAF3_text;
+        } else if (current_stim.timer == 'rpaf_loop') {
+            disp_func = disp_rPAF1_text;
+            DT.loopOn();
+        } else if (current_stim.timer == 'none') {
             disp_func = disp_none_text;
         } else {
             console.error('No display function found');
@@ -115,19 +137,27 @@ function next_trial() {
 // display functions
 
 function disp_rPAF1_text() {
-    console.log('disp_rPAF_text', neat_date());
-    document.getElementById('stimulus_id').textContent = current_stim.item;
+    console.log('disp_rPAF1_text', neat_date());
+    if (current_stim.type == 'text') {
+        document.getElementById('stimulus_id').textContent = current_stim.item;
+    } else {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     raf_times.start_before = DT.now();
-    DT.rPAF1(function() {
+    DT.rPAF(function(stamp) {
         stim_starts = DT.now();
+        raf_times.start_stamp = stamp;
 
         setTimeout(function() {
-
-            document.getElementById('stimulus_id').textContent = '';
+            if (current_stim.type == 'text') {
+                document.getElementById('stimulus_id').textContent = '';
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
             raf_times.end_before = DT.now();
-            DT.rPAF1(function() {
+            DT.rPAF(function(stamp2) {
                 stim_ends = DT.now();
-                DT.loopOff();
+                raf_times.end_stamp = stamp2;
                 store_trial();
             });
 
@@ -136,12 +166,91 @@ function disp_rPAF1_text() {
     });
 }
 
+
+function disp_rPAF2_text() {
+    requestAnimationFrame(function() {
+        console.log('disp_rPAF2_text', neat_date());
+        if (current_stim.type == 'text') {
+            document.getElementById('stimulus_id').textContent = current_stim.item;
+        } else {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        raf_times.start_before = DT.now();
+        DT.rPAF(function(stamp) {
+            stim_starts = DT.now();
+            raf_times.start_stamp = stamp;
+
+            setTimeout(function() {
+
+                requestAnimationFrame(function() {
+                    if (current_stim.type == 'text') {
+                        document.getElementById('stimulus_id').textContent = '';
+                    } else {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    }
+                    raf_times.end_before = DT.now();
+                    DT.rPAF(function(stamp2) {
+                        stim_ends = DT.now();
+                        raf_times.end_stamp = stamp2;
+                        store_trial();
+                    });
+                });
+
+            }, current_stim.duration);
+
+        });
+    });
+}
+
+function disp_rPAF3_text() {
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            console.log('disp_rPAF3_text', neat_date());
+            if (current_stim.type == 'text') {
+                document.getElementById('stimulus_id').textContent = current_stim.item;
+            } else {
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            raf_times.start_before = DT.now();
+            DT.rPAF(function(stamp) {
+                stim_starts = DT.now();
+                raf_times.start_stamp = stamp;
+
+                setTimeout(function() {
+
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(function() {
+                            if (current_stim.type == 'text') {
+                                document.getElementById('stimulus_id').textContent = '';
+                            } else {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
+                            raf_times.end_before = DT.now();
+                            DT.rPAF(function(stamp2) {
+                                stim_ends = DT.now();
+                                raf_times.end_stamp = stamp2;
+                                store_trial();
+                            });
+                        });
+                    });
+
+                }, current_stim.duration);
+
+            });
+        });
+    });
+}
+
 function disp_rAF1_text() {
-    console.log('disp_rAF_text', neat_date());
+    console.log('disp_rAF1_text', neat_date());
     raf_times.start_before = DT.now();
 
     requestAnimationFrame(function(stamp) {
-        document.getElementById('stimulus_id').textContent = current_stim.item;
+        if (current_stim.type == 'text') {
+            document.getElementById('stimulus_id').textContent = current_stim.item;
+        } else {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         stim_starts = DT.now();
         raf_times.start_stamp = stamp;
 
@@ -149,10 +258,13 @@ function disp_rAF1_text() {
             raf_times.end_before = DT.now();
 
             requestAnimationFrame(function(stamp2) {
-                document.getElementById('stimulus_id').textContent = '';
-                raf_times.end_stamp = stamp2;
+                if (current_stim.type == 'text') {
+                    document.getElementById('stimulus_id').textContent = '';
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
                 stim_ends = DT.now();
-                DT.loopOff();
+                raf_times.end_stamp = stamp2;
                 store_trial();
             });
 
@@ -161,13 +273,94 @@ function disp_rAF1_text() {
     });
 }
 
+function disp_rAF2_text() {
+    requestAnimationFrame(function() {
+        console.log('disp_rAF2_text', neat_date());
+        raf_times.start_before = DT.now();
+        requestAnimationFrame(function(stamp) {
+            if (current_stim.type == 'text') {
+                document.getElementById('stimulus_id').textContent = current_stim.item;
+            } else {
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            stim_starts = DT.now();
+            raf_times.start_stamp = stamp;
+
+            setTimeout(function() {
+
+                requestAnimationFrame(function() {
+                    raf_times.end_before = DT.now();
+                    requestAnimationFrame(function(stamp2) {
+                        if (current_stim.type == 'text') {
+                            document.getElementById('stimulus_id').textContent = '';
+                        } else {
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        }
+                        stim_ends = DT.now();
+                        raf_times.end_stamp = stamp2;
+                        store_trial();
+                    });
+                });
+
+            }, current_stim.duration);
+
+        });
+    });
+}
+
+function disp_rAF3_text() {
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            console.log('disp_rAF3_text', neat_date());
+            raf_times.start_before = DT.now();
+            requestAnimationFrame(function(stamp) {
+                if (current_stim.type == 'text') {
+                    document.getElementById('stimulus_id').textContent = current_stim.item;
+                } else {
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                stim_starts = DT.now();
+                raf_times.start_stamp = stamp;
+
+                setTimeout(function() {
+
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(function() {
+                            raf_times.end_before = DT.now();
+                            requestAnimationFrame(function(stamp2) {
+                                if (current_stim.type == 'text') {
+                                    document.getElementById('stimulus_id').textContent = '';
+                                } else {
+                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                }
+                                stim_ends = DT.now();
+                                raf_times.end_stamp = stamp2;
+                                store_trial();
+                            });
+                        });
+                    });
+
+                }, current_stim.duration);
+
+            });
+        });
+    });
+}
+
 function disp_none_text() {
     console.log('disp_none_text', neat_date());
-    document.getElementById('stimulus_id').textContent = current_stim.item;
+    if (current_stim.type == 'text') {
+        document.getElementById('stimulus_id').textContent = current_stim.item;
+    } else {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     stim_starts = DT.now();
     setTimeout(function() {
-        document.getElementById('stimulus_id').textContent = '';
-        raf_times.end_before = DT.now();
+        if (current_stim.type == 'text') {
+            document.getElementById('stimulus_id').textContent = '';
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
         stim_ends = DT.now();
         store_trial();
     }, current_stim.duration);
@@ -224,6 +417,7 @@ function store_trial() {
 }
 
 function ending() {
+    console.log('THE END');
     full_data += jscd_text;
     document.getElementById('dl_id').style.display = 'block';
 }
