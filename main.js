@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 
 let date_time, jscd_text, listenkey, text_to_show, raf_times,
-    stim_color, input_time, stim_starts, stim_ends, pressed_key, keycode,
+    stim_color, input_time, stim_starts, stim_ends,
     disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
@@ -19,20 +19,12 @@ document.addEventListener("DOMContentLoaded", function() {
     ctx = canvas.getContext('2d');
     document.body.addEventListener('keydown', function(e) {
         input_time = DT.now();
-        if (listenkey) {
-            keycode = e.which || e.keyCode || 0;
-            pressed_key = e.key;
-            if (pressed_key == 'q') {
-                listenkey = false;
-                disp_func();
-            }
-        } else if (startclicked) {
-            keycode = e.which || e.keyCode || 0;
-            pressed_key = e.key;
-            if (pressed_key == 'x') {
-                next_trial();
-                startclicked = false;
-            }
+        if (listenkey && e.key == 'q') {
+            listenkey = false;
+            disp_func();
+        } else if (startclicked && e.key == 'x') {
+            next_trial();
+            startclicked = false;
         }
     });
 });
@@ -51,7 +43,7 @@ function begin(colr) {
 
 function stim_gen() {
     let times = 10;
-    let durs = [16.66, 50, 150, 300, 500];
+    let durs = [16, 50, 150, 300, 500];
     let timers = [
         'rpaf1', 'rpaf2', 'rpaf3', 'rpaf_loop',
         'raf1', 'raf2', 'raf3', 'raf_loop', 'none'
@@ -161,7 +153,7 @@ function disp_rPAF1_text() {
                 store_trial();
             });
 
-        }, current_stim.duration);
+        }, current_stim.duration - 10);
 
     });
 }
@@ -196,7 +188,7 @@ function disp_rPAF2_text() {
                     });
                 });
 
-            }, current_stim.duration);
+            }, current_stim.duration - 10);
 
         });
     });
@@ -234,7 +226,7 @@ function disp_rPAF3_text() {
                         });
                     });
 
-                }, current_stim.duration);
+                }, current_stim.duration - 10);
 
             });
         });
@@ -268,7 +260,7 @@ function disp_rAF1_text() {
                 store_trial();
             });
 
-        }, current_stim.duration);
+        }, current_stim.duration - 10);
 
     });
 }
@@ -302,7 +294,7 @@ function disp_rAF2_text() {
                     });
                 });
 
-            }, current_stim.duration);
+            }, current_stim.duration - 10);
 
         });
     });
@@ -340,7 +332,7 @@ function disp_rAF3_text() {
                         });
                     });
 
-                }, current_stim.duration);
+                }, current_stim.duration - 10);
 
             });
         });
@@ -363,7 +355,7 @@ function disp_none_text() {
         }
         stim_ends = DT.now();
         store_trial();
-    }, current_stim.duration);
+    }, current_stim.duration - 10);
 }
 
 // store
@@ -378,8 +370,6 @@ let full_data = [
     "t_input",
     "t_disp_start",
     "t_disp_end",
-    "pressed_key",
-    "key_code",
     "raf_start_before",
     "raf_start_stamp",
     "raf_end_before",
@@ -397,8 +387,6 @@ function store_trial() {
         input_time,
         stim_starts,
         stim_ends,
-        pressed_key,
-        keycode,
         raf_times.start_before || 'na',
         raf_times.start_stamp || 'na',
         raf_times.end_before || 'na',
@@ -407,8 +395,6 @@ function store_trial() {
     input_time = 'na';
     stim_starts = 'na';
     stim_ends = 'na';
-    pressed_key = 'na';
-    keycode = 'na';
     if (allstims.length > 0) {
         next_trial();
     } else {
@@ -420,6 +406,10 @@ function ending() {
     console.log('THE END');
     full_data += jscd_text;
     document.getElementById('dl_id').style.display = 'block';
+    document.getElementById('bg_id').style.backgroundColor = "white";
+    setTimeout(function() {
+        document.getElementById('bg_id').style.backgroundColor = "black";
+    }, 3000);
 }
 
 function dl_as_file() {
