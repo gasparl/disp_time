@@ -1,7 +1,7 @@
 /*jshint esversion: 6 */
 
 let date_time, jscd_text, listenkey, text_to_show, raf_times,
-    stim_color, input_time, stim_starts, stim_ends,
+    bg_color, input_time, stim_starts, stim_ends,
     disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return ('<br>' + hed + ': <b>' + cols[ind] + '</b>');
     });
     date_time = neat_date();
-    jscd_text = 'client\t' + heads.join('/') + '\t' + cols.join('/');
+    jscd_text = 'client\t' + heads.join('/') + '/bg\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
     canvas = document.getElementById('canvas_id');
     ctx = canvas.getContext('2d');
@@ -30,11 +30,14 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function begin(colr) {
-    stim_color = colr;
-    if (stim_color == 'white') {
+    bg_color = colr;
+    if (bg_color == 'black') {
         document.getElementById('stimulus_id').style.color = "white";
         ctx.fillStyle = "white";
         document.getElementById('bg_id').style.backgroundColor = "black";
+        jscd_text += '/black';
+    } else {
+        jscd_text += '/white';
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
     stim_gen();
@@ -45,8 +48,8 @@ function stim_gen() {
     let times = 10;
     let durs = [16, 50, 150, 300, 500];
     let timers = [
-        'rpaf1', 'rpaf2', 'rpaf3', 'rpaf_loop',
-        'raf1', 'raf2', 'raf3', 'raf_loop', 'none'
+        'rPAF_alone', 'rPAF_1rAF', 'rPAF_2rAF', 'rPAF_loop',
+        'rAF_single', 'rAF_double', 'rAF_3', 'rAF_loop', 'none'
     ];
     let types = {
         'text': Array(times).fill('■'),
@@ -93,26 +96,27 @@ function next_trial() {
         '</b><br>Type: <b>' + current_stim.type +
         '</b><br>Duration: <b>' + current_stim.duration +
         '</b><br>Timer: <b>' + current_stim.timer +
-        '</b><br>Color: <b>' + stim_color + '</b>';
+        '</b><br>Color: <b>' + bg_color + '</b>';
     DT.loopOff();
     setTimeout(function() {
-        if (current_stim.timer == 'raf1') {
+        if (current_stim.timer == 'rAF_single') {
             disp_func = disp_rAF1_text;
-        } else if (current_stim.timer == 'raf2') {
+        } else if (current_stim.timer == 'rAF_double') {
             disp_func = disp_rAF2_text;
-        } else if (current_stim.timer == 'raf3') {
-            disp_func = disp_rAF3_text;
-        } else if (current_stim.timer == 'raf_loop') {
+        } else if (current_stim.timer == 'rAF_loop') {
             disp_func = disp_rAF1_text;
             DT.loopOn();
-        } else if (current_stim.timer == 'rpaf1') {
+        } else if (current_stim.timer == 'rPAF_alone') {
             disp_func = disp_rPAF1_text;
-        } else if (current_stim.timer == 'rpaf2') {
+        } else if (current_stim.timer == 'rPAF_1rAF') {
             disp_func = disp_rPAF2_text;
-        } else if (current_stim.timer == 'rpaf3') {
+        } else if (current_stim.timer == 'rPAF_2rAF') {
             disp_func = disp_rPAF3_text;
-        } else if (current_stim.timer == 'rpaf_loop') {
+        } else if (current_stim.timer == 'rPAF_loop') {
             disp_func = disp_rPAF1_text;
+            DT.loopOn();
+        } else if (current_stim.timer == 'rPAF_1rAF_loop') {
+            disp_func = disp_rPAF2_text;
             DT.loopOn();
         } else if (current_stim.timer == 'none') {
             disp_func = disp_none_text;
@@ -367,9 +371,9 @@ let full_data = [
     "type",
     "duration",
     "timer",
-    "t_input",
-    "t_disp_start",
-    "t_disp_end",
+    "js_input",
+    "js_disp_start",
+    "js_disp_end",
     "raf_start_before",
     "raf_start_stamp",
     "raf_end_before",
@@ -387,14 +391,14 @@ function store_trial() {
         input_time,
         stim_starts,
         stim_ends,
-        raf_times.start_before || 'na',
-        raf_times.start_stamp || 'na',
-        raf_times.end_before || 'na',
-        raf_times.end_stamp || 'na'
+        raf_times.start_before || 'NA',
+        raf_times.start_stamp || 'NA',
+        raf_times.end_before || 'NA',
+        raf_times.end_stamp || 'NA'
     ].join('\t') + '\n';
-    input_time = 'na';
-    stim_starts = 'na';
-    stim_ends = 'na';
+    input_time = 'NA';
+    stim_starts = 'NA';
+    stim_ends = 'NA';
     if (allstims.length > 0) {
         next_trial();
     } else {
@@ -414,7 +418,7 @@ function ending() {
 
 function dl_as_file() {
     filename_to_dl = 'disptime_' + jscd.os + '_' +
-        jscd.browser + '_' + stim_color + '_' + date_time + '.txt';
+        jscd.browser + '_' + bg_color + '_' + date_time + '.txt';
     data_to_dl = full_data;
     let blobx = new Blob([data_to_dl], {
         type: 'text/plain'
