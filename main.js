@@ -1,8 +1,7 @@
 /*jshint esversion: 6 */
 
-let date_time, jscd_text, listenkey, text_to_show, raf_times,
-    bg_color, input_time, stim_starts, stim_ends,
-    disp_func, canvas, ctx;
+let date_time, jscd_text, listenkey, text_to_show, js_times,
+    bg_color, input_time, disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
 
@@ -87,7 +86,7 @@ function stim_gen() {
 
 function next_trial() {
     trialnum++;
-    raf_times = {};
+    js_times = {};
     current_stim = allstims.shift();
     console.log(current_stim);
     document.getElementById('info_id').innerHTML =
@@ -139,10 +138,10 @@ function disp_rPAF1_text() {
     } else {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    raf_times.start_before = DT.now();
+    js_times.start_nextline = DT.now();
     DT.rPAF(function(stamp) {
-        stim_starts = DT.now();
-        raf_times.start_stamp = stamp;
+        js_times.start_other = DT.now();
+        js_times.start_stamp = stamp;
 
         setTimeout(function() {
             if (current_stim.type == 'text') {
@@ -150,10 +149,10 @@ function disp_rPAF1_text() {
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
-            raf_times.end_before = DT.now();
+            js_times.end_nextline = DT.now();
             DT.rPAF(function(stamp2) {
-                stim_ends = DT.now();
-                raf_times.end_stamp = stamp2;
+                js_times.end_other = DT.now();
+                js_times.end_stamp = stamp2;
                 store_trial();
             });
 
@@ -171,10 +170,10 @@ function disp_rPAF2_text() {
         } else {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        raf_times.start_before = DT.now();
+        js_times.start_nextline = DT.now();
         DT.rPAF(function(stamp) {
-            stim_starts = DT.now();
-            raf_times.start_stamp = stamp;
+            js_times.start_other = DT.now();
+            js_times.start_stamp = stamp;
 
             setTimeout(function() {
 
@@ -184,10 +183,10 @@ function disp_rPAF2_text() {
                     } else {
                         ctx.clearRect(0, 0, canvas.width, canvas.height);
                     }
-                    raf_times.end_before = DT.now();
+                    js_times.end_nextline = DT.now();
                     DT.rPAF(function(stamp2) {
-                        stim_ends = DT.now();
-                        raf_times.end_stamp = stamp2;
+                        js_times.end_other = DT.now();
+                        js_times.end_stamp = stamp2;
                         store_trial();
                     });
                 });
@@ -207,10 +206,10 @@ function disp_rPAF3_text() {
             } else {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
-            raf_times.start_before = DT.now();
+            js_times.start_nextline = DT.now();
             DT.rPAF(function(stamp) {
-                stim_starts = DT.now();
-                raf_times.start_stamp = stamp;
+                js_times.start_other = DT.now();
+                js_times.start_stamp = stamp;
 
                 setTimeout(function() {
 
@@ -221,10 +220,10 @@ function disp_rPAF3_text() {
                             } else {
                                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                             }
-                            raf_times.end_before = DT.now();
+                            js_times.end_nextline = DT.now();
                             DT.rPAF(function(stamp2) {
-                                stim_ends = DT.now();
-                                raf_times.end_stamp = stamp2;
+                                js_times.end_other = DT.now();
+                                js_times.end_stamp = stamp2;
                                 store_trial();
                             });
                         });
@@ -239,7 +238,7 @@ function disp_rPAF3_text() {
 
 function disp_rAF1_text() {
     console.log('disp_rAF1_text', neat_date());
-    raf_times.start_before = DT.now();
+    js_times.start_other = DT.now();
 
     requestAnimationFrame(function(stamp) {
         if (current_stim.type == 'text') {
@@ -247,11 +246,11 @@ function disp_rAF1_text() {
         } else {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        stim_starts = DT.now();
-        raf_times.start_stamp = stamp;
+        js_times.start_nextline = DT.now();
+        js_times.start_stamp = stamp;
 
         setTimeout(function() {
-            raf_times.end_before = DT.now();
+            js_times.end_other = DT.now();
 
             requestAnimationFrame(function(stamp2) {
                 if (current_stim.type == 'text') {
@@ -259,8 +258,8 @@ function disp_rAF1_text() {
                 } else {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
-                stim_ends = DT.now();
-                raf_times.end_stamp = stamp2;
+                js_times.end_nextline = DT.now();
+                js_times.end_stamp = stamp2;
                 store_trial();
             });
 
@@ -272,28 +271,28 @@ function disp_rAF1_text() {
 function disp_rAF2_text() {
     requestAnimationFrame(function() {
         console.log('disp_rAF2_text', neat_date());
-        raf_times.start_before = DT.now();
+        js_times.start_other = DT.now();
         requestAnimationFrame(function(stamp) {
             if (current_stim.type == 'text') {
                 document.getElementById('stimulus_id').textContent = current_stim.item;
             } else {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
-            stim_starts = DT.now();
-            raf_times.start_stamp = stamp;
+            js_times.start_nextline = DT.now();
+            js_times.start_stamp = stamp;
 
             setTimeout(function() {
 
                 requestAnimationFrame(function() {
-                    raf_times.end_before = DT.now();
+                    js_times.end_other = DT.now();
                     requestAnimationFrame(function(stamp2) {
                         if (current_stim.type == 'text') {
                             document.getElementById('stimulus_id').textContent = '';
                         } else {
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
                         }
-                        stim_ends = DT.now();
-                        raf_times.end_stamp = stamp2;
+                        js_times.end_nextline = DT.now();
+                        js_times.end_stamp = stamp2;
                         store_trial();
                     });
                 });
@@ -308,29 +307,29 @@ function disp_rAF3_text() {
     requestAnimationFrame(function() {
         requestAnimationFrame(function() {
             console.log('disp_rAF3_text', neat_date());
-            raf_times.start_before = DT.now();
+            js_times.start_other = DT.now();
             requestAnimationFrame(function(stamp) {
                 if (current_stim.type == 'text') {
                     document.getElementById('stimulus_id').textContent = current_stim.item;
                 } else {
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-                stim_starts = DT.now();
-                raf_times.start_stamp = stamp;
+                js_times.start_nextline = DT.now();
+                js_times.start_stamp = stamp;
 
                 setTimeout(function() {
 
                     requestAnimationFrame(function() {
                         requestAnimationFrame(function() {
-                            raf_times.end_before = DT.now();
+                            js_times.end_other = DT.now();
                             requestAnimationFrame(function(stamp2) {
                                 if (current_stim.type == 'text') {
                                     document.getElementById('stimulus_id').textContent = '';
                                 } else {
                                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                                 }
-                                stim_ends = DT.now();
-                                raf_times.end_stamp = stamp2;
+                                js_times.end_nextline = DT.now();
+                                js_times.end_stamp = stamp2;
                                 store_trial();
                             });
                         });
@@ -350,14 +349,18 @@ function disp_none_text() {
     } else {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    stim_starts = DT.now();
+    js_times.start_nextline = DT.now();
+    js_times.start_stamp = js_times.start_nextline;
+    js_times.start_other = js_times.start_nextline;
     setTimeout(function() {
         if (current_stim.type == 'text') {
             document.getElementById('stimulus_id').textContent = '';
         } else {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
-        stim_ends = DT.now();
+        js_times.end_nextline = DT.now();
+        js_times.end_stamp = js_times.end_nextline;
+        js_times.end_other = js_times.end_nextline;
         store_trial();
     }, current_stim.duration - 10);
 }
@@ -372,12 +375,12 @@ let full_data = [
     "duration",
     "timer",
     "js_input",
-    "js_disp_start",
-    "js_disp_end",
-    "raf_start_before",
-    "raf_start_stamp",
-    "raf_end_before",
-    "raf_end_stamp"
+    "js_start_nextline",
+    "js_end_nextline",
+    "js_start_stamp",
+    "js_end_stamp",
+    "js_start_other",
+    "js_end_other"
 ].join('\t') + '\n';
 
 function store_trial() {
@@ -389,16 +392,14 @@ function store_trial() {
         current_stim.duration,
         current_stim.timer,
         input_time,
-        stim_starts,
-        stim_ends,
-        raf_times.start_before || 'NA',
-        raf_times.start_stamp || 'NA',
-        raf_times.end_before || 'NA',
-        raf_times.end_stamp || 'NA'
+        js_times.start_nextline || 'NA',
+        js_times.end_nextline || 'NA',
+        js_times.start_stamp || 'NA',
+        js_times.end_stamp || 'NA',
+        js_times.start_other || 'NA',
+        js_times.end_other || 'NA'
     ].join('\t') + '\n';
     input_time = 'NA';
-    stim_starts = 'NA';
-    stim_ends = 'NA';
     if (allstims.length > 0) {
         next_trial();
     } else {
@@ -433,9 +434,9 @@ function dl_as_file() {
 
 function neat_date() {
     let m = new Date();
-    return m.getFullYear() + "" +
+    return m.getFullYear() + "_" +
         ("0" + (m.getMonth() + 1)).slice(-2) + "" +
-        ("0" + m.getDate()).slice(-2) + "" +
+        ("0" + m.getDate()).slice(-2) + "_" +
         ("0" + m.getHours()).slice(-2) + "" +
         ("0" + m.getMinutes()).slice(-2) + "" +
         ("0" + m.getSeconds()).slice(-2);
