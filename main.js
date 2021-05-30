@@ -49,7 +49,7 @@ function stim_gen() {
     let durs = [16, 50, 150, 300, 500];
     let timers = [
         'rPAF_alone', 'rPAF_1rAF', 'rPAF_2rAF', 'rPAF_loop',
-        'rAF_single', 'rAF_double', 'rAF_loop', 'none'
+        'rAF_single', 'rAF_double', 'rAF_loop', 'none', 'rPAF_1rAF_loop'
     ];
     let types = {
         'text': Array(times).fill('■'),
