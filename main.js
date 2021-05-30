@@ -96,7 +96,7 @@ function next_trial() {
         '</b><br>Type: <b>' + current_stim.type +
         '</b><br>Duration: <b>' + current_stim.duration +
         '</b><br>Timer: <b>' + current_stim.timer +
-        '</b><br>Color: <b>' + bg_color + '</b>';
+        '</b><br>Background: <b>' + bg_color + '</b>';
     DT.loopOff();
     setTimeout(function() {
         if (current_stim.timer == 'rAF_single') {
@@ -412,10 +412,9 @@ function ending() {
     console.log('THE END');
     full_data += jscd_text;
     document.getElementById('dl_id').style.display = 'block';
-    document.getElementById('bg_id').style.backgroundColor = "white";
     setTimeout(function() {
-        document.getElementById('bg_id').style.backgroundColor = "black";
-    }, 3000);
+        document.getElementById('bg_id').style.backgroundColor = "blue";
+    }, 5000);
 }
 
 function dl_as_file() {
