@@ -37,6 +37,7 @@ function begin(colr) {
         jscd_text += '/black';
     } else {
         jscd_text += '/white';
+        document.getElementById('bg_id').style.backgroundColor = "white";
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
     stim_gen();
