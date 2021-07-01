@@ -18,6 +18,7 @@ my_win = Window(fullscr = True, units = 'pix', color= 'white')
 
 therect = Rect( my_win, width=800, height=400, lineColor = 'lightblue', fillColor = 'red')
 info = TextStim(my_win, text ='Info...', height = 50, pos=(0, 0))
+info.autoDraw = True
 
 durations = [16, 50, 150, 300, 500]
 date_time = str(strftime("%Y_%m%d_%H%M", gmtime()))
@@ -87,7 +88,8 @@ timer = Clock()
 for dur in durations:    
     trialnum += 1
     current_stim['duration'] = dur
-    therect.fillColor = stim_color
+    disp_text()
+    therect.fillColor = stim_color    
     therect.draw()
     my_win.callOnFlip(t_start)
     pressed_key = waitKeys('q')
@@ -103,6 +105,9 @@ for dur in durations:
     
     store_trial()
     print( pressed_key.name, pressed_key.rt )
+
+
+data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color)
 
 data_out.close()
 wait(3)
