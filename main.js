@@ -1,9 +1,11 @@
 /*jshint esversion: 6 */
 
+const use_images = true;
 let date_time, jscd_text, listenkey, text_to_show, js_times,
     bg_color, input_time, disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
+let allimages = [];
 
 document.addEventListener("DOMContentLoaded", function() {
     let heads = ["os", "os_v", "browser", "browser_v", "screen"];
@@ -53,18 +55,32 @@ function stim_gen() {
     ];
     let types = {
         'text': Array(times).fill('■'),
-        'img_canvas': Array(times).fill('_'),
-        'img_tiny': [1, 2, 3],
-        'img_small': [1, 2, 3],
-        'img_medium': [1, 2, 3],
-        'img_large': [1, 2, 3]
-    };
-
-    // TODO: remove
-    types = {
-        'text': Array(times).fill('■'),
         'img_canvas': Array(times).fill('_')
     };
+
+    if (use_images == true) {
+        const imgtypes = {
+            'img_tiny': 'png',
+            'img_small': 'jpg',
+            'img_medium': 'bmp',
+            'img_large': 'bmp'
+        };
+        Object.keys(imgtypes).forEach((img_x) => {
+            types[img_x] = Array(10).fill(0).map(function(x, y) {
+                let fnam = img_x + y + '_' + bg_color + '.' + imgtypes[img_x];
+                allimages.push('./images/' + fnam);
+                return (fnam);
+            });
+        });
+
+        DT.preload(allimages)
+            .then(function(images) {
+                console.log('Preloaded all', images);
+            })
+            .catch(function(err) {
+                console.error('Failed', err);
+            });
+    }
 
     allstims = [];
     timers.forEach((tmr) => {

@@ -67,7 +67,20 @@ const DT = {
             console.warn('loopOff()');
         }
         this.loop = false;
-    }
+    },
+    images: {},
+    preload: sources =>
+        Promise.all(
+            sources.map(
+                src => new Promise(function(resolve, reject) {
+                    const img = new Image();
+                    DT.images[src] = img;
+                    img.onload = function() {
+                        resolve(img);
+                    };
+                    img.onerror = reject;
+                    img.src = src;
+                })))
 };
 
 DT.loopFunction = function() {
