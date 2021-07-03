@@ -80,7 +80,23 @@ const DT = {
                     };
                     img.onerror = reject;
                     img.src = src;
-                })))
+                }))),
+    canvas: {},
+    contex: {},
+    addCanvas: (id) => {
+        this.canvas[id] = document.getElementById(id);
+        this.contex[id] = this.canvas[id].getContext('2d');
+    },
+    clearCanvas: (id) => {
+        ctx.clearRect(0, 0, this.canvas[id].width, this.canvas[id].height);
+    },
+    drawCanvas: (id, image) => {
+        var ratio = image.naturalHeight / image.naturalWidth;
+        this.contex[id].drawImage(image, 0, 0, width, height);
+    },
+    drawCanvasDef: (id, image) => {
+        this.contex[id].drawImage(image, 0, 0);
+    }
 };
 
 DT.loopFunction = function() {
