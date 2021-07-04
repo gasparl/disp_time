@@ -90,12 +90,14 @@ const DT = {
     clearCanvas: (id) => {
         ctx.clearRect(0, 0, this.canvas[id].width, this.canvas[id].height);
     },
-    drawCanvas: (id, image) => {
-        var ratio = image.naturalHeight / image.naturalWidth;
-        this.contex[id].drawImage(image, 0, 0, width, height);
+    drawCanvas: (id, src) => {
+        let image = DT.images[src];
+        this.canvas[id].width = image.naturalWidth;
+        this.canvas[id].height = image.naturalHeight;
+        this.contex[id].drawImage(image, 0, 0, canvas.width, canvas.width * ratio);
     },
-    drawCanvasDef: (id, image) => {
-        this.contex[id].drawImage(image, 0, 0);
+    drawCanvasDef: (id, src) => {
+        this.contex[id].drawImage(image[src], 0, 0);
     }
 };
 

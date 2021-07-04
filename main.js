@@ -1,8 +1,7 @@
 /*jshint esversion: 6 */
 
-const use_images = true;
-let date_time, jscd_text, listenkey, text_to_show, js_times,
-    bg_color, input_time, disp_func, canvas, ctx;
+let use_images, date_time, jscd_text, listenkey, text_to_show, js_times,
+    bg_color, stim_color, input_time, disp_func, canvas, ctx;
 let trialnum = 0;
 let startclicked = false;
 let allimages = [];
@@ -30,14 +29,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function begin(colr) {
+function begin(colr, imguse) {
     bg_color = colr;
+    use_images = imguse;
     if (bg_color == 'black') {
+        stim_color = 'white';
         document.getElementById('stimulus_id').style.color = "white";
         ctx.fillStyle = "white";
         document.getElementById('bg_id').style.backgroundColor = "black";
         jscd_text += '/black';
     } else {
+        stim_color = 'black';
         jscd_text += '/white';
         document.getElementById('bg_id').style.backgroundColor = "white";
     }
@@ -58,7 +60,7 @@ function stim_gen() {
         'img_canvas': Array(times).fill('_')
     };
 
-    if (use_images == true) {
+    if (use_images === true) {
         const imgtypes = {
             'img_tiny': 'png',
             'img_small': 'jpg',
@@ -67,7 +69,7 @@ function stim_gen() {
         };
         Object.keys(imgtypes).forEach((img_x) => {
             types[img_x] = Array(10).fill(0).map(function(x, y) {
-                let fnam = img_x + y + '_' + bg_color + '.' + imgtypes[img_x];
+                let fnam = img_x + y + '_' + stim_color + '.' + imgtypes[img_x];
                 allimages.push('./images/' + fnam);
                 return (fnam);
             });
