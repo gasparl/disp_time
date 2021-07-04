@@ -84,20 +84,20 @@ const DT = {
     canvas: {},
     contex: {},
     addCanvas: (id) => {
-        this.canvas[id] = document.getElementById(id);
-        this.contex[id] = this.canvas[id].getContext('2d');
+        DT.canvas[id] = document.getElementById(id);
+        DT.contex[id] = DT.canvas[id].getContext('2d');
     },
     clearCanvas: (id) => {
-        ctx.clearRect(0, 0, this.canvas[id].width, this.canvas[id].height);
+        ctx.clearRect(0, 0, DT.canvas[id].width, DT.canvas[id].height);
     },
     drawCanvas: (id, src) => {
         let image = DT.images[src];
-        this.canvas[id].width = image.naturalWidth;
-        this.canvas[id].height = image.naturalHeight;
-        this.contex[id].drawImage(image, 0, 0, canvas.width, canvas.width * ratio);
+        DT.canvas[id].width = image.naturalWidth;
+        DT.canvas[id].height = image.naturalHeight;
+        DT.contex[id].drawImage(image, 0, 0);
     },
     drawCanvasDef: (id, src) => {
-        this.contex[id].drawImage(image[src], 0, 0);
+        DT.contex[id].drawImage(image[src], 0, 0);
     }
 };
 

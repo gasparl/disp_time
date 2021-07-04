@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return ('<br>' + hed + ': <b>' + cols[ind] + '</b>');
     });
     date_time = neat_date();
-    jscd_text = 'client\t' + heads.join('/') + '/bg\t' + cols.join('/');
+    jscd_text = 'client\t' + heads.join('/') + '/bg/xstart\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
     canvas = document.getElementById('canvas_id');
     ctx = canvas.getContext('2d');
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
             listenkey = false;
             disp_func();
         } else if (startclicked && e.key == 'x') {
+            jscd_text += input_time;
             next_trial();
             startclicked = false;
         }
@@ -51,15 +52,18 @@ function begin(colr, imguse) {
 function stim_gen() {
     let times = 10;
     let durs = [16, 50, 150, 300, 500];
-    let timers = [
-        'rPAF_alone', 'rPAF_1rAF', 'rPAF_2rAF', 'rPAF_loop',
-        'rAF_single', 'rAF_double', 'rAF_loop', 'none', 'rPAF_1rAF_loop'
-    ];
-    let types = {
-        'text': Array(times).fill('■'),
-        'img_canvas': Array(times).fill('_')
-    };
-
+    let methods;
+    if (use_images === true) {
+        methods = [
+            'canvas', 'opacity', 'none'
+        ];
+    } else {
+        methods = [
+            'rPAF_alone', 'rPAF_1rAF', 'rPAF_2rAF', 'rPAF_loop',
+            'rAF_single', 'rAF_double', 'rAF_loop', 'none', 'rPAF_1rAF_loop'
+        ];
+    }
+    let types = {};
     if (use_images === true) {
         const imgtypes = {
             'img_tiny': 'png',
@@ -69,23 +73,30 @@ function stim_gen() {
         };
         Object.keys(imgtypes).forEach((img_x) => {
             types[img_x] = Array(10).fill(0).map(function(x, y) {
-                let fnam = img_x + y + '_' + stim_color + '.' + imgtypes[img_x];
-                allimages.push('./images/' + fnam);
+                let fnam = './images/' + img_x + y + '_' + stim_color + '.' + imgtypes[img_x];
+                allimages.push(fnam);
                 return (fnam);
             });
         });
-
+        DT.addCanvas('canvas_id');
         DT.preload(allimages)
             .then(function(images) {
                 console.log('Preloaded all', images);
+                document.getElementById('bg_id').style.border = "solid 3px blue";
             })
             .catch(function(err) {
                 console.error('Failed', err);
             });
+    } else {
+        types = {
+            'text': Array(times).fill('■'),
+            'img_canvas': Array(times).fill('_')
+        };
+        document.getElementById('bg_id').style.border = "solid 3px blue";
     }
 
     allstims = [];
-    timers.forEach((tmr) => {
+    methods.forEach((tmr) => {
         durs.forEach((dur) => {
             Object.keys(types).forEach((typ) => {
                 let stims = shuffle(types[typ]).slice(0, times);
@@ -94,7 +105,7 @@ function stim_gen() {
                         'item': itm,
                         'duration': dur,
                         'type': typ,
-                        'timer': tmr
+                        'method': tmr
                     });
                 });
             });
@@ -113,34 +124,23 @@ function next_trial() {
         ' left)<br>Item: <b>' + current_stim.item +
         '</b><br>Type: <b>' + current_stim.type +
         '</b><br>Duration: <b>' + current_stim.duration +
-        '</b><br>Timer: <b>' + current_stim.timer +
+        '</b><br>Method: <b>' + current_stim.method +
         '</b><br>Background: <b>' + bg_color + '</b>';
     DT.loopOff();
-    setTimeout(function() {
-        if (current_stim.timer == 'rAF_single') {
-            disp_func = disp_rAF1_text;
-        } else if (current_stim.timer == 'rAF_double') {
-            disp_func = disp_rAF2_text;
-        } else if (current_stim.timer == 'rAF_loop') {
-            disp_func = disp_rAF1_text;
-            DT.loopOn();
-        } else if (current_stim.timer == 'rPAF_alone') {
-            disp_func = disp_rPAF1_text;
-        } else if (current_stim.timer == 'rPAF_1rAF') {
-            disp_func = disp_rPAF2_text;
-        } else if (current_stim.timer == 'rPAF_2rAF') {
-            disp_func = disp_rPAF3_text;
-        } else if (current_stim.timer == 'rPAF_loop') {
-            disp_func = disp_rPAF1_text;
-            DT.loopOn();
-        } else if (current_stim.timer == 'rPAF_1rAF_loop') {
-            disp_func = disp_rPAF2_text;
-            DT.loopOn();
-        } else if (current_stim.timer == 'none') {
-            disp_func = disp_none_text;
+    if (current_stim.method != 'canvas') {
+        if (current_stim.method == 'none') {
+            DT.images[current_stim.item].style.visibility = 'hidden';
         } else {
-            console.error('No display function found');
-            store_trial();
+            DT.images[current_stim.item].style.opacity = 0;
+            DT.images[current_stim.item].style.willChange = 'opacity';
+        }
+        document.getElementById('stimulus_id').appendChild(DT.images[current_stim.item]);
+    }
+    setTimeout(function() {
+        if (use_images === true) {
+            set_img_conds();
+        } else {
+            set_disp_conds();
         }
         setTimeout(function() {
             listenkey = true;
@@ -148,7 +148,80 @@ function next_trial() {
     }, 100);
 }
 
-// display functions
+function set_img_conds() {
+    disp_func = disp_image;
+    DT.loopOn();
+}
+
+function set_disp_conds() {
+    if (current_stim.method == 'rAF_single') {
+        disp_func = disp_rAF1_text;
+    } else if (current_stim.method == 'rAF_double') {
+        disp_func = disp_rAF2_text;
+    } else if (current_stim.method == 'rAF_loop') {
+        disp_func = disp_rAF1_text;
+        DT.loopOn();
+    } else if (current_stim.method == 'rPAF_alone') {
+        disp_func = disp_rPAF1_text;
+    } else if (current_stim.method == 'rPAF_1rAF') {
+        disp_func = disp_rPAF2_text;
+    } else if (current_stim.method == 'rPAF_2rAF') {
+        disp_func = disp_rPAF3_text;
+    } else if (current_stim.method == 'rPAF_loop') {
+        disp_func = disp_rPAF1_text;
+        DT.loopOn();
+    } else if (current_stim.method == 'rPAF_1rAF_loop') {
+        disp_func = disp_rPAF2_text;
+        DT.loopOn();
+    } else if (current_stim.method == 'none') {
+        disp_func = disp_none_text;
+    } else {
+        console.error('No display function found');
+        store_trial();
+    }
+}
+
+//*** display functions ***//
+
+// image methods
+
+function disp_image() {
+    console.log('disp_image', neat_date());
+    js_times.start_other = DT.now();
+
+    requestAnimationFrame(function(stamp) {
+        if (current_stim.method == 'canvas') {
+            DT.drawCanvas('canvas_id', current_stim.item);
+        } else if (current_stim.method == 'none') {
+            DT.images[current_stim.item].style.visibility = 'visible';
+        } else {
+            DT.images[current_stim.item].style.opacity = 1;
+        }
+        js_times.start_nextline = DT.now();
+        js_times.start_stamp = stamp;
+
+        setTimeout(function() {
+            js_times.end_other = DT.now();
+
+            requestAnimationFrame(function(stamp2) {
+                if (current_stim.method == 'canvas') {
+                    DT.clearCanvas('canvas_id');
+                } else if (current_stim.method == 'none') {
+                    DT.images[current_stim.item].style.visibility = 'hidden';
+                } else {
+                    DT.images[current_stim.item].style.opacity = 0;
+                }
+                js_times.end_nextline = DT.now();
+                js_times.end_stamp = stamp2;
+                store_trial();
+            });
+
+        }, current_stim.duration - 10);
+
+    });
+}
+
+// timing methods
 
 function disp_rPAF1_text() {
     console.log('disp_rPAF1_text', neat_date());
@@ -392,7 +465,7 @@ let full_data = [
     "stimulus",
     "type",
     "duration",
-    "timer",
+    "method",
     "js_input",
     "js_start_nextline",
     "js_end_nextline",
@@ -403,13 +476,15 @@ let full_data = [
 ].join('\t') + '\n';
 
 function store_trial() {
+    let c_item;
+    c_item = current_stim.item.replace('./images/', '');
     full_data += [
         date_time,
         trialnum,
-        current_stim.item,
+        c_item,
         current_stim.type,
         current_stim.duration,
-        current_stim.timer,
+        current_stim.method,
         input_time,
         js_times.start_nextline || 'NA',
         js_times.end_nextline || 'NA',
@@ -419,6 +494,9 @@ function store_trial() {
         js_times.end_other || 'NA'
     ].join('\t') + '\n';
     input_time = 'NA';
+    document.getElementById('stimulus_id').innerHTML = '';
+    DT.images[current_stim.item].style.visibility = 'visible';
+    DT.images[current_stim.item].style.opacity = 1;
     if (allstims.length > 0) {
         next_trial();
     } else {

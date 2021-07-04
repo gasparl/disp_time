@@ -66,7 +66,7 @@ def waitKeys(keyList = None):
     while True:
         keys = kb.getKeys(keyList=keyList)
         if keys:
-            return keys[1]
+            return keys[0]
         sleep(0.00001)
 
 def disp_text():
@@ -82,7 +82,7 @@ def t_end():
 trialnum = 0
 therect.draw()
 my_win.flip()
-waitKeys('x')
+xstart = waitKeys('x')
 timer = Clock()
 
 for dur in durations:    
@@ -107,7 +107,7 @@ for dur in durations:
     print( pressed_key.name, pressed_key.rt )
 
 
-data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color)
+data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg", "xstart"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color + '/' + xstart[1])
 
 data_out.close()
 wait(3)
