@@ -38,10 +38,10 @@ function begin(colr, imguse) {
         document.getElementById('stimulus_id').style.color = "white";
         ctx.fillStyle = "white";
         document.getElementById('bg_id').style.backgroundColor = "black";
-        jscd_text += '/black';
+        jscd_text += '/black/';
     } else {
         stim_color = 'black';
-        jscd_text += '/white';
+        jscd_text += '/white/';
         document.getElementById('bg_id').style.backgroundColor = "white";
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
@@ -59,8 +59,8 @@ function stim_gen() {
         ];
     } else {
         methods = [
-            'rPAF_alone', 'rPAF_1rAF', 'rPAF_2rAF', 'rPAF_loop',
-            'rAF_single', 'rAF_double', 'rAF_loop', 'none', 'rPAF_1rAF_loop'
+            'rPAF_alone', 'rPAF_1rAF', 'rPAF_loop', 'rAFpre_loop', 'rAFpre_loop',
+            'rAF_single', 'rAF_double', 'rAF_loop', 'none'
         ];
     }
     let types = {};
@@ -81,8 +81,13 @@ function stim_gen() {
         DT.addCanvas('canvas_id');
         DT.preload(allimages)
             .then(function(images) {
+                for (let ikey in DT.images) {
+                    DT.images[ikey].style.visibility = 'hidden';
+                    DT.images[ikey].style.opacity = 0;
+                    document.getElementById('stimulus_id').appendChild(DT.images[ikey]);
+                }
                 console.log('Preloaded all', images);
-                document.getElementById('bg_id').style.border = "solid 3px blue";
+                checkLoad();
             })
             .catch(function(err) {
                 console.error('Failed', err);
@@ -114,6 +119,31 @@ function stim_gen() {
     allstims = shuffle(allstims);
 }
 
+
+function loaded(img) {
+    if (!img.complete) {
+        return false;
+    }
+    if (typeof img.naturalWidth != "undefined" && img.naturalWidth == 0) {
+        return false;
+    }
+    return true;
+}
+
+function checkLoad() {
+    for (let ikey in DT.images) {
+        if (!loaded(DT.images[ikey])) {
+            setTimeout(checkLoad, 50);
+            console.log('Failed completion');
+            return false;
+        }
+    }
+    console.log('All images complete');
+    document.getElementById('bg_id').style.border = "solid 3px blue";
+}
+
+// operations
+
 function next_trial() {
     trialnum++;
     js_times = {};
@@ -127,14 +157,21 @@ function next_trial() {
         '</b><br>Method: <b>' + current_stim.method +
         '</b><br>Background: <b>' + bg_color + '</b>';
     DT.loopOff();
-    if (current_stim.method != 'canvas') {
-        if (current_stim.method == 'none') {
-            DT.images[current_stim.item].style.visibility = 'hidden';
+    if (use_images == true) {
+        document.getElementById('stimulus_id').style.visibility = 'hidden';
+        DT.images[current_stim.item].style.visibility = 'visible';
+        DT.images[current_stim.item].style.opacity = 1;
+        if (current_stim.method != 'canvas') {
+            if (current_stim.method == 'none') {
+                DT.images[current_stim.item].style.visibility = 'hidden';
+            } else {
+                DT.images[current_stim.item].style.opacity = 0;
+                DT.images[current_stim.item].style.willChange = 'opacity';
+            }
+            document.getElementById('stimulus_id').appendChild(DT.images[current_stim.item]);
         } else {
-            DT.images[current_stim.item].style.opacity = 0;
-            DT.images[current_stim.item].style.willChange = 'opacity';
+            document.getElementById('stimulus_id').innerHTML = '';
         }
-        document.getElementById('stimulus_id').appendChild(DT.images[current_stim.item]);
     }
     setTimeout(function() {
         if (use_images === true) {
@@ -153,6 +190,8 @@ function set_img_conds() {
     DT.loopOn();
 }
 
+
+
 function set_disp_conds() {
     if (current_stim.method == 'rAF_single') {
         disp_func = disp_rAF1_text;
@@ -161,17 +200,17 @@ function set_disp_conds() {
     } else if (current_stim.method == 'rAF_loop') {
         disp_func = disp_rAF1_text;
         DT.loopOn();
+    } else if (current_stim.method == 'rAFpre') {
+        disp_func = disp_rAF1pre_text;
+    } else if (current_stim.method == 'rAFpre_loop') {
+        disp_func = disp_rAF1pre_text;
+        DT.loopOn();
     } else if (current_stim.method == 'rPAF_alone') {
         disp_func = disp_rPAF1_text;
     } else if (current_stim.method == 'rPAF_1rAF') {
         disp_func = disp_rPAF2_text;
-    } else if (current_stim.method == 'rPAF_2rAF') {
-        disp_func = disp_rPAF3_text;
     } else if (current_stim.method == 'rPAF_loop') {
         disp_func = disp_rPAF1_text;
-        DT.loopOn();
-    } else if (current_stim.method == 'rPAF_1rAF_loop') {
-        disp_func = disp_rPAF2_text;
         DT.loopOn();
     } else if (current_stim.method == 'none') {
         disp_func = disp_none_text;
@@ -216,7 +255,7 @@ function disp_image() {
                 store_trial();
             });
 
-        }, current_stim.duration - 10);
+        }, current_stim.duration - 5);
 
     });
 }
@@ -248,7 +287,7 @@ function disp_rPAF1_text() {
                 store_trial();
             });
 
-        }, current_stim.duration - 10);
+        }, current_stim.duration - 5);
 
     });
 }
@@ -283,47 +322,8 @@ function disp_rPAF2_text() {
                     });
                 });
 
-            }, current_stim.duration - 10);
+            }, current_stim.duration - 5);
 
-        });
-    });
-}
-
-function disp_rPAF3_text() {
-    requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-            console.log('disp_rPAF3_text', neat_date());
-            if (current_stim.type == 'text') {
-                document.getElementById('stimulus_id').textContent = current_stim.item;
-            } else {
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            js_times.start_nextline = DT.now();
-            DT.rPAF(function(stamp) {
-                js_times.start_other = DT.now();
-                js_times.start_stamp = stamp;
-
-                setTimeout(function() {
-
-                    requestAnimationFrame(function() {
-                        requestAnimationFrame(function() {
-                            if (current_stim.type == 'text') {
-                                document.getElementById('stimulus_id').textContent = '';
-                            } else {
-                                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            }
-                            js_times.end_nextline = DT.now();
-                            DT.rPAF(function(stamp2) {
-                                js_times.end_other = DT.now();
-                                js_times.end_stamp = stamp2;
-                                store_trial();
-                            });
-                        });
-                    });
-
-                }, current_stim.duration - 10);
-
-            });
         });
     });
 }
@@ -355,7 +355,7 @@ function disp_rAF1_text() {
                 store_trial();
             });
 
-        }, current_stim.duration - 10);
+        }, current_stim.duration - 5);
 
     });
 }
@@ -389,48 +389,42 @@ function disp_rAF2_text() {
                     });
                 });
 
-            }, current_stim.duration - 10);
+            }, current_stim.duration - 5);
 
         });
     });
 }
 
-function disp_rAF3_text() {
-    requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-            console.log('disp_rAF3_text', neat_date());
-            js_times.start_other = DT.now();
-            requestAnimationFrame(function(stamp) {
-                if (current_stim.type == 'text') {
-                    document.getElementById('stimulus_id').textContent = current_stim.item;
-                } else {
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
-                js_times.start_nextline = DT.now();
-                js_times.start_stamp = stamp;
 
-                setTimeout(function() {
+function disp_rAF1pre_text() {
+    console.log('disp_rAF1pre_text', neat_date());
+    js_times.start_other = DT.now();
 
-                    requestAnimationFrame(function() {
-                        requestAnimationFrame(function() {
-                            js_times.end_other = DT.now();
-                            requestAnimationFrame(function(stamp2) {
-                                if (current_stim.type == 'text') {
-                                    document.getElementById('stimulus_id').textContent = '';
-                                } else {
-                                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                                }
-                                js_times.end_nextline = DT.now();
-                                js_times.end_stamp = stamp2;
-                                store_trial();
-                            });
-                        });
-                    });
+    if (current_stim.type == 'text') {
+        document.getElementById('stimulus_id').textContent = current_stim.item;
+    } else {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    requestAnimationFrame(function(stamp) {
+        js_times.start_nextline = DT.now();
+        js_times.start_stamp = stamp;
 
-                }, current_stim.duration - 10);
+        setTimeout(function() {
+            js_times.end_other = DT.now();
 
+            if (current_stim.type == 'text') {
+                document.getElementById('stimulus_id').textContent = '';
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            requestAnimationFrame(function(stamp2) {
+                js_times.end_nextline = DT.now();
+                js_times.end_stamp = stamp2;
+                store_trial();
             });
-        });
+
+        }, current_stim.duration - 5);
+
     });
 }
 
@@ -454,7 +448,7 @@ function disp_none_text() {
         js_times.end_stamp = js_times.end_nextline;
         js_times.end_other = js_times.end_nextline;
         store_trial();
-    }, current_stim.duration - 10);
+    }, current_stim.duration - 5);
 }
 
 // store
@@ -494,9 +488,6 @@ function store_trial() {
         js_times.end_other || 'NA'
     ].join('\t') + '\n';
     input_time = 'NA';
-    document.getElementById('stimulus_id').innerHTML = '';
-    DT.images[current_stim.item].style.visibility = 'visible';
-    DT.images[current_stim.item].style.opacity = 1;
     if (allstims.length > 0) {
         next_trial();
     } else {
