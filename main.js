@@ -133,7 +133,7 @@ function loaded(img) {
 function checkLoad() {
     for (let ikey in DT.images) {
         if (!loaded(DT.images[ikey])) {
-            setTimeout(checkLoad, 50);
+            alert('Failed image completion!');
             console.log('Failed completion');
             return false;
         }
@@ -410,13 +410,13 @@ function disp_rAF1pre_text() {
         js_times.start_stamp = stamp;
 
         setTimeout(function() {
-            js_times.end_other = DT.now();
 
             if (current_stim.type == 'text') {
                 document.getElementById('stimulus_id').textContent = '';
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
+            js_times.end_other = DT.now();
             requestAnimationFrame(function(stamp2) {
                 js_times.end_nextline = DT.now();
                 js_times.end_stamp = stamp2;
