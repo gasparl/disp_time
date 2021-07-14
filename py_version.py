@@ -1,10 +1,14 @@
 from psychopy.visual import Window, Rect, TextStim
 from psychopy.core import wait, quit, Clock
+from psychopy.event import globalKeys
 from psychopy.hardware import keyboard
 from time import gmtime, strftime, sleep
 from sys import exit
+from random import shuffle
+globalKeys.add(key="q",modifiers=["ctrl"],func=core.quit)
 
 bg_color = 'white' # white black
+reps = 3
 #
 if bg_color == 'white':
     stim_color = 'black'
@@ -14,10 +18,10 @@ else:
     exit('wrong bg_color')
 
 kb = keyboard.Keyboard()
-my_win = Window(fullscr = True, units = 'pix', color= 'white')
+my_win = Window(fullscr = False, size = (1000, 600), units = 'pix', color= 'white')
 
-therect = Rect( my_win, width=800, height=400, lineColor = 'lightblue', fillColor = 'red')
-info = TextStim(my_win, text ='Info...', height = 50, pos=(0, 0))
+therect = Rect( my_win, width=500, height=500, lineColor = 'lightblue', fillColor = 'red')
+info = TextStim(my_win, text ='Info...', height = 30, pos=(-400, 300), color = 'green')
 info.autoDraw = True
 
 durations = [16, 50, 150, 300, 500]
@@ -28,7 +32,7 @@ current_stim = {}
 input_time = 'NA'
 time_start = 'NA'
 time_end = 'NA'
-        
+
 data_out.write('\t'.join([
     "datetime",
     "trial_number",
@@ -44,33 +48,35 @@ data_out.write('\t'.join([
     "js_start_other",
     "js_end_other"
 ]) + '\n')
-def store_trial():     
-    data_out.write('\t'.join([
+
+def store_trial():
+    data_out.write('\t'.join(
+        [str(el) for el in [
         date_time,
         trialnum,
         '_',
         'py',
         current_stim['duration'],
         'py',
-        pressed_key.rt,
+        rt_start,
         time_start,
         time_end,
         time_start,
         time_end,
         'NA',
-        'NA'
-    ]) + '\n');
+        'NA']]
+        ) + '\n');
 
 def waitKeys(keyList = None):
     kb.clock.reset()
     while True:
         keys = kb.getKeys(keyList=keyList)
         if keys:
-            return keys[0]
+            return keys[0].rt
         sleep(0.00001)
 
 def disp_text():
-    info.text = 'Current trial: <b>' + str(trialnum) + '</b> (' + str(len(durations)-trialnum)  + ' left)\nDuration: <b>' + str(current_stim['duration']) + '</b>\nBackground: <b>' + bg_color + '</b>'
+    info.text = 'Current trial: <b>' + str(trialnum) + '</b> (' + str(len(durations*reps)-trialnum)  + ' left)\nDuration: <b>' + str(current_stim['duration']) + '</b>\nBackground: <b>' + bg_color + '</b>'
 
 def t_start():
     global time_start
@@ -79,42 +85,47 @@ def t_end():
     global time_end
     time_end = timer.getTime()
 
+
+therect.draw()
+my_win.flip()
+wait(3)
+therect.fillColor = bg_color
 trialnum = 0
 therect.draw()
 my_win.flip()
 xstart = waitKeys('x')
 timer = Clock()
 
-for dur in durations:    
-    trialnum += 1
-    current_stim['duration'] = dur
-    disp_text()
-    therect.fillColor = stim_color    
-    therect.draw()
-    my_win.callOnFlip(t_start)
-    pressed_key = waitKeys('q')
-    
-    my_win.flip()
-    
-    wait((dur-10)/1000)
-    therect.fillColor = bg_color
-    therect.draw()
-    my_win.callOnFlip(t_end)
-    
-    my_win.flip()
-    
-    store_trial()
-    print( pressed_key.name, pressed_key.rt )
+for i in range(reps):
+    shuffle(durations)
+    for dur in durations:
+        trialnum += 1
+        current_stim['duration'] = dur
+        disp_text()
+        therect.fillColor = stim_color
+        therect.draw()
+        my_win.callOnFlip(t_start)
+        rt_start = waitKeys('q')
+
+        my_win.flip()
+
+        wait((dur-5)/1000)
+        therect.fillColor = bg_color
+        therect.draw()
+        my_win.callOnFlip(t_end)
+
+        my_win.flip()
+
+        store_trial()
 
 
-data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg", "xstart"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color + '/' + xstart[1])
-
+data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg", "xstart"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color + '/' + str(xstart))
 data_out.close()
 wait(3)
 therect.fillColor = 'blue'
 therect.draw()
 my_win.flip()
-waitKeys()
+waitKeys("b")
+print("The end.")
 
 quit()
-
