@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return ('<br>' + hed + ': <b>' + cols[ind] + '</b>');
     });
     date_time = neat_date();
-    jscd_text = 'client\t' + heads.join('/') + '/bg/xstart\t' + cols.join('/');
+    jscd_text = 'client\t' + heads.join('/') + '/study/bg/xstart\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
     canvas = document.getElementById('canvas_id');
     ctx = canvas.getContext('2d');
@@ -33,15 +33,20 @@ document.addEventListener("DOMContentLoaded", function() {
 function begin(colr, imguse) {
     bg_color = colr;
     use_images = imguse;
+    if (use_images) {
+        jscd_text += '/image/';
+    } else {
+        jscd_text += '/plain/';
+    }
     if (bg_color == 'black') {
         stim_color = 'white';
         document.getElementById('stimulus_id').style.color = "white";
         ctx.fillStyle = "white";
         document.getElementById('bg_id').style.backgroundColor = "black";
-        jscd_text += '/black/';
+        jscd_text += 'black/';
     } else {
         stim_color = 'black';
-        jscd_text += '/white/';
+        jscd_text += 'white/';
         document.getElementById('bg_id').style.backgroundColor = "white";
     }
     document.getElementById('btns_id').style.visibility = 'hidden';
@@ -505,7 +510,13 @@ function ending() {
 }
 
 function dl_as_file() {
-    filename_to_dl = 'disptime_' + jscd.os + '_' +
+    let stud;
+    if (use_images) {
+        stud = 'image_';
+    } else {
+        stud = 'plain_';
+    }
+    filename_to_dl = 'disptime_' + stud + jscd.os + '_' +
         jscd.browser + '_' + bg_color + '_' + date_time + '.txt';
     data_to_dl = full_data;
     let blobx = new Blob([data_to_dl], {
