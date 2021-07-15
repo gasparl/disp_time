@@ -5,7 +5,7 @@ from psychopy.hardware import keyboard
 from time import gmtime, strftime, sleep
 from sys import exit
 from random import shuffle
-globalKeys.add(key="q",modifiers=["ctrl"],func=core.quit)
+globalKeys.add(key="q",modifiers=["ctrl"],func=quit)
 
 bg_color = 'white' # white black
 reps = 3
@@ -18,7 +18,7 @@ else:
     exit('wrong bg_color')
 
 kb = keyboard.Keyboard()
-my_win = Window(fullscr = False, size = (1000, 600), units = 'pix', color= 'white')
+my_win = Window(fullscr = True, size = (1000, 600), units = 'pix', color= 'white')
 
 therect = Rect( my_win, width=500, height=500, lineColor = 'lightblue', fillColor = 'red')
 info = TextStim(my_win, text ='Info...', height = 30, pos=(-400, 300), color = 'green')
@@ -58,11 +58,11 @@ def store_trial():
         'py',
         current_stim['duration'],
         'py',
-        rt_start,
-        time_start,
-        time_end,
-        time_start,
-        time_end,
+        rt_start*1000,
+        time_start*1000,
+        time_end*1000,
+        time_start*1000,
+        time_end*1000,
         'NA',
         'NA']]
         ) + '\n');
@@ -76,7 +76,7 @@ def waitKeys(keyList = None):
         sleep(0.00001)
 
 def disp_text():
-    info.text = 'Current trial: <b>' + str(trialnum) + '</b> (' + str(len(durations*reps)-trialnum)  + ' left)\nDuration: <b>' + str(current_stim['duration']) + '</b>\nBackground: <b>' + bg_color + '</b>'
+    info.text = 'Current trial: ' + str(trialnum) + ' (' + str(len(durations*reps)-trialnum)  + ' left)\nDuration: ' + str(current_stim['duration']) + '\nBackground: ' + bg_color + ''
 
 def t_start():
     global time_start
@@ -119,7 +119,7 @@ for i in range(reps):
         store_trial()
 
 
-data_out.write('/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg", "xstart"]) + '\n' + 'NA/NA/psychopy/NA/NA/' + bg_color + '/' + str(xstart))
+data_out.write('client\t' + '/'.join(["os", "os_v", "browser", "browser_v", "screen", "bg", "xstart"]) + '\t' + 'NA/NA/psychopy/NA/NA/' + bg_color + '/' + str(xstart*1000))
 data_out.close()
 wait(3)
 therect.fillColor = 'blue'
