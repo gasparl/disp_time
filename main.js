@@ -5,6 +5,7 @@ let use_images, date_time, jscd_text, listenkey, text_to_show, js_times,
 let trialnum = 0;
 let startclicked = false;
 let allimages = [];
+let d_buff = 10;
 
 document.addEventListener("DOMContentLoaded", function() {
     let heads = ["os", "os_v", "browser", "browser_v", "screen"];
@@ -16,7 +17,9 @@ document.addEventListener("DOMContentLoaded", function() {
     jscd_text = 'client\t' + heads.join('/') + '/study/bg/xstart\t' + cols.join('/');
     document.getElementById('jscd_id').innerHTML = jscd_show;
     canvas = document.getElementById('canvas_id');
-    ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d', {
+        desynchronized: true
+    });
     document.body.addEventListener('keydown', function(e) {
         input_time = DT.now();
         if (listenkey && e.key == 'q') {
@@ -64,7 +67,7 @@ function stim_gen() {
         ];
     } else {
         methods = [
-            'rPAF_alone', 'rPAF_1rAF', 'rPAF_loop', 'rAFpre_loop', 'rAFpre_loop',
+            'rPAF_1rAF', 'rPAF_loop', 'rAFpre', 'rAFpre_double', 'rAFpre_loop',
             'rAF_single', 'rAF_double', 'rAF_loop', 'none'
         ];
     }
@@ -207,6 +210,8 @@ function set_disp_conds() {
         DT.loopOn();
     } else if (current_stim.method == 'rAFpre') {
         disp_func = disp_rAF1pre_text;
+    } else if (current_stim.method == 'rAFpre_double') {
+        disp_func = disp_rAF2pre_text;
     } else if (current_stim.method == 'rAFpre_loop') {
         disp_func = disp_rAF1pre_text;
         DT.loopOn();
@@ -257,10 +262,20 @@ function disp_image() {
                 }
                 js_times.end_nextline = DT.now();
                 js_times.end_stamp = stamp2;
-                store_trial();
+                requestAnimationFrame(function(stamp3) {
+                    requestAnimationFrame(function(stamp4) {
+                        requestAnimationFrame(function(stamp5) {
+                            requestAnimationFrame(function(stamp6) {
+                                requestAnimationFrame(function(stamp7) {
+                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                });
+                            });
+                        });
+                    });
+                });
             });
 
-        }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
 
     });
 }
@@ -289,10 +304,20 @@ function disp_rPAF1_text() {
             DT.rPAF(function(stamp2) {
                 js_times.end_other = DT.now();
                 js_times.end_stamp = stamp2;
-                store_trial();
+                requestAnimationFrame(function(stamp3) {
+                    requestAnimationFrame(function(stamp4) {
+                        requestAnimationFrame(function(stamp5) {
+                            requestAnimationFrame(function(stamp6) {
+                                requestAnimationFrame(function(stamp7) {
+                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                });
+                            });
+                        });
+                    });
+                });
             });
 
-        }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
 
     });
 }
@@ -310,26 +335,36 @@ function disp_rPAF2_text() {
         DT.rPAF(function(stamp) {
             js_times.start_other = DT.now();
             js_times.start_stamp = stamp;
+        });
 
-            setTimeout(function() {
+        setTimeout(function() {
 
-                requestAnimationFrame(function() {
-                    if (current_stim.type == 'text') {
-                        document.getElementById('stimulus_id').textContent = '';
-                    } else {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    }
-                    js_times.end_nextline = DT.now();
-                    DT.rPAF(function(stamp2) {
-                        js_times.end_other = DT.now();
-                        js_times.end_stamp = stamp2;
-                        store_trial();
+            requestAnimationFrame(function() {
+                if (current_stim.type == 'text') {
+                    document.getElementById('stimulus_id').textContent = '';
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                js_times.end_nextline = DT.now();
+                DT.rPAF(function(stamp2) {
+                    js_times.end_other = DT.now();
+                    js_times.end_stamp = stamp2;
+                    requestAnimationFrame(function(stamp3) {
+                        requestAnimationFrame(function(stamp4) {
+                            requestAnimationFrame(function(stamp5) {
+                                requestAnimationFrame(function(stamp6) {
+                                    requestAnimationFrame(function(stamp7) {
+                                        store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
+            });
 
-            }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
 
-        });
     });
 }
 
@@ -357,46 +392,65 @@ function disp_rAF1_text() {
                 }
                 js_times.end_nextline = DT.now();
                 js_times.end_stamp = stamp2;
-                store_trial();
+                requestAnimationFrame(function(stamp3) {
+                    requestAnimationFrame(function(stamp4) {
+                        requestAnimationFrame(function(stamp5) {
+                            requestAnimationFrame(function(stamp6) {
+                                requestAnimationFrame(function(stamp7) {
+                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                });
+                            });
+                        });
+                    });
+                });
             });
 
-        }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
 
     });
 }
 
 function disp_rAF2_text() {
+    console.log('disp_rAF2_text', neat_date());
     requestAnimationFrame(function() {
-        console.log('disp_rAF2_text', neat_date());
-        js_times.start_other = DT.now();
+        if (current_stim.type == 'text') {
+            document.getElementById('stimulus_id').textContent = current_stim.item;
+        } else {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        js_times.start_nextline = DT.now();
         requestAnimationFrame(function(stamp) {
-            if (current_stim.type == 'text') {
-                document.getElementById('stimulus_id').textContent = current_stim.item;
-            } else {
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-            js_times.start_nextline = DT.now();
+            js_times.start_other = DT.now();
             js_times.start_stamp = stamp;
+        });
 
-            setTimeout(function() {
-
-                requestAnimationFrame(function() {
-                    js_times.end_other = DT.now();
-                    requestAnimationFrame(function(stamp2) {
-                        if (current_stim.type == 'text') {
-                            document.getElementById('stimulus_id').textContent = '';
-                        } else {
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        }
-                        js_times.end_nextline = DT.now();
-                        js_times.end_stamp = stamp2;
-                        store_trial();
+        setTimeout(function() {
+            requestAnimationFrame(function() {
+                js_times.end_other = DT.now();
+                if (current_stim.type == 'text') {
+                    document.getElementById('stimulus_id').textContent = '';
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                requestAnimationFrame(function(stamp2) {
+                    js_times.end_nextline = DT.now();
+                    js_times.end_stamp = stamp2;
+                    requestAnimationFrame(function(stamp3) {
+                        requestAnimationFrame(function(stamp4) {
+                            requestAnimationFrame(function(stamp5) {
+                                requestAnimationFrame(function(stamp6) {
+                                    requestAnimationFrame(function(stamp7) {
+                                        store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                    });
+                                });
+                            });
+                        });
                     });
                 });
+            });
 
-            }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
 
-        });
     });
 }
 
@@ -421,14 +475,68 @@ function disp_rAF1pre_text() {
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
-            js_times.end_other = DT.now();
+            js_times.end_nextline = DT.now();
             requestAnimationFrame(function(stamp2) {
-                js_times.end_nextline = DT.now();
+                js_times.end_other = DT.now();
                 js_times.end_stamp = stamp2;
-                store_trial();
+                requestAnimationFrame(function(stamp3) {
+                    requestAnimationFrame(function(stamp4) {
+                        requestAnimationFrame(function(stamp5) {
+                            requestAnimationFrame(function(stamp6) {
+                                requestAnimationFrame(function(stamp7) {
+                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                });
+                            });
+                        });
+                    });
+                });
             });
 
-        }, current_stim.duration - 5);
+        }, current_stim.duration - d_buff);
+
+    });
+}
+
+function disp_rAF2pre_text() {
+    console.log('disp_rAF2_text', neat_date());
+    if (current_stim.type == 'text') {
+        document.getElementById('stimulus_id').textContent = current_stim.item;
+    } else {
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    js_times.start_nextline = DT.now();
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function(stamp) {
+            js_times.start_other = DT.now();
+            js_times.start_stamp = stamp;
+        });
+
+        setTimeout(function() {
+            if (current_stim.type == 'text') {
+                document.getElementById('stimulus_id').textContent = '';
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            js_times.end_nextline = DT.now();
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function(stamp2) {
+                    js_times.end_other = DT.now();
+                    js_times.end_stamp = stamp2;
+                    requestAnimationFrame(function(stamp3) {
+                        requestAnimationFrame(function(stamp4) {
+                            requestAnimationFrame(function(stamp5) {
+                                requestAnimationFrame(function(stamp6) {
+                                    requestAnimationFrame(function(stamp7) {
+                                        store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+
+        }, current_stim.duration - d_buff);
 
     });
 }
@@ -452,8 +560,18 @@ function disp_none_text() {
         js_times.end_nextline = DT.now();
         js_times.end_stamp = js_times.end_nextline;
         js_times.end_other = js_times.end_nextline;
-        store_trial();
-    }, current_stim.duration - 5);
+        requestAnimationFrame(function(stamp3) {
+            requestAnimationFrame(function(stamp4) {
+                requestAnimationFrame(function(stamp5) {
+                    requestAnimationFrame(function(stamp6) {
+                        requestAnimationFrame(function(stamp7) {
+                            store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
+                        });
+                    });
+                });
+            });
+        });
+    }, current_stim.duration - d_buff);
 }
 
 // store
@@ -471,10 +589,11 @@ let full_data = [
     "js_start_stamp",
     "js_end_stamp",
     "js_start_other",
-    "js_end_other"
+    "js_end_other",
+    "js_endloop"
 ].join('\t') + '\n';
 
-function store_trial() {
+function store_trial(prolog = 'NA') {
     let c_item;
     c_item = current_stim.item.replace('./images/', '');
     full_data += [
@@ -490,7 +609,8 @@ function store_trial() {
         js_times.start_stamp || 'NA',
         js_times.end_stamp || 'NA',
         js_times.start_other || 'NA',
-        js_times.end_other || 'NA'
+        js_times.end_other || 'NA',
+        prolog
     ].join('\t') + '\n';
     input_time = 'NA';
     if (allstims.length > 0) {
