@@ -1,5 +1,5 @@
 from psychopy.visual import Window, Rect, TextStim
-from psychopy.core import wait, quit, Clock
+from psychopy.core import wait, quit
 from psychopy.event import globalKeys
 from psychopy.hardware import keyboard
 from time import gmtime, strftime, sleep
@@ -68,7 +68,6 @@ def store_trial():
         ) + '\n');
 
 def waitKeys(keyList = None):
-    kb.clock.reset()
     while True:
         keys = kb.getKeys(keyList=keyList)
         if keys:
@@ -80,21 +79,21 @@ def disp_text():
 
 def t_start():
     global time_start
-    time_start = timer.getTime()
+    time_start = kb.clock.getTime()
 def t_end():
     global time_end
-    time_end = timer.getTime()
+    time_end = kb.clock.getTime()
 
 
 therect.draw()
 my_win.flip()
 wait(3)
+kb.clock.reset()
 therect.fillColor = bg_color
 trialnum = 0
 therect.draw()
 my_win.flip()
 xstart = waitKeys('x')
-timer = Clock()
 
 for i in range(reps):
     shuffle(durations)
