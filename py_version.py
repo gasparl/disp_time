@@ -8,7 +8,7 @@ from random import shuffle
 globalKeys.add(key="q",modifiers=["ctrl"],func=quit)
 
 bg_color = 'white' # white black
-reps = 3
+reps = 50
 #
 if bg_color == 'white':
     stim_color = 'black'
