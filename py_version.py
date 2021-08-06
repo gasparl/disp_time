@@ -39,7 +39,7 @@ data_out.write('\t'.join([
     "stimulus",
     "type",
     "duration",
-    "timer",
+    "method",
     "js_input",
     "js_start_nextline",
     "js_end_nextline",
@@ -67,13 +67,6 @@ def store_trial():
         'NA']]
         ) + '\n');
 
-def waitKeys(keyList = None):
-    while True:
-        keys = kb.getKeys(keyList=keyList)
-        if keys:
-            return keys[0].rt
-        sleep(0.00001)
-
 def disp_text():
     info.text = 'Current trial: ' + str(trialnum) + ' (' + str(len(durations*reps)-trialnum)  + ' left)\nDuration: ' + str(current_stim['duration']) + '\nBackground: ' + bg_color + ''
 
@@ -93,7 +86,7 @@ therect.fillColor = bg_color
 trialnum = 0
 therect.draw()
 my_win.flip()
-xstart = waitKeys('x')
+xstart = kb.waitKeys(keyList = 'x')[0].rt
 
 for i in range(reps):
     shuffle(durations)
@@ -104,11 +97,11 @@ for i in range(reps):
         therect.fillColor = stim_color
         therect.draw()
         my_win.callOnFlip(t_start)
-        rt_start = waitKeys('q')
+        rt_start = kb.waitKeys(keyList = 'q')[0].rt
 
         my_win.flip()
 
-        wait((dur-5)/1000)
+        wait((dur-10)/1000)
         therect.fillColor = bg_color
         therect.draw()
         my_win.callOnFlip(t_end)
@@ -124,7 +117,7 @@ wait(3)
 therect.fillColor = 'blue'
 therect.draw()
 my_win.flip()
-waitKeys("b")
+kb.waitKeys(keyList = 'b')
 print("The end.")
 
 quit()
