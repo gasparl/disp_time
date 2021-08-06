@@ -262,17 +262,7 @@ function disp_image() {
                 }
                 js_times.end_nextline = DT.now();
                 js_times.end_stamp = stamp2;
-                requestAnimationFrame(function(stamp3) {
-                    requestAnimationFrame(function(stamp4) {
-                        requestAnimationFrame(function(stamp5) {
-                            requestAnimationFrame(function(stamp6) {
-                                requestAnimationFrame(function(stamp7) {
-                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                });
-                            });
-                        });
-                    });
-                });
+                store_trial();
             });
 
         }, current_stim.duration - d_buff);
@@ -304,17 +294,7 @@ function disp_rPAF1_text() {
             DT.rPAF(function(stamp2) {
                 js_times.end_other = DT.now();
                 js_times.end_stamp = stamp2;
-                requestAnimationFrame(function(stamp3) {
-                    requestAnimationFrame(function(stamp4) {
-                        requestAnimationFrame(function(stamp5) {
-                            requestAnimationFrame(function(stamp6) {
-                                requestAnimationFrame(function(stamp7) {
-                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                });
-                            });
-                        });
-                    });
-                });
+                store_trial();
             });
 
         }, current_stim.duration - d_buff);
@@ -348,17 +328,7 @@ function disp_rPAF2_text() {
                     DT.rPAF(function(stamp2) {
                         js_times.end_other = DT.now();
                         js_times.end_stamp = stamp2;
-                        requestAnimationFrame(function(stamp3) {
-                            requestAnimationFrame(function(stamp4) {
-                                requestAnimationFrame(function(stamp5) {
-                                    requestAnimationFrame(function(stamp6) {
-                                        requestAnimationFrame(function(stamp7) {
-                                            store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                        });
-                                    });
-                                });
-                            });
-                        });
+                        store_trial();
                     });
                 });
 
@@ -392,17 +362,7 @@ function disp_rAF1_text() {
                 }
                 js_times.end_nextline = DT.now();
                 js_times.end_stamp = stamp2;
-                requestAnimationFrame(function(stamp3) {
-                    requestAnimationFrame(function(stamp4) {
-                        requestAnimationFrame(function(stamp5) {
-                            requestAnimationFrame(function(stamp6) {
-                                requestAnimationFrame(function(stamp7) {
-                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                });
-                            });
-                        });
-                    });
-                });
+                store_trial();
             });
 
         }, current_stim.duration - d_buff);
@@ -434,17 +394,7 @@ function disp_rAF2_text() {
                     requestAnimationFrame(function(stamp2) {
                         js_times.end_nextline = DT.now();
                         js_times.end_stamp = stamp2;
-                        requestAnimationFrame(function(stamp3) {
-                            requestAnimationFrame(function(stamp4) {
-                                requestAnimationFrame(function(stamp5) {
-                                    requestAnimationFrame(function(stamp6) {
-                                        requestAnimationFrame(function(stamp7) {
-                                            store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                        });
-                                    });
-                                });
-                            });
-                        });
+                        store_trial();
                     });
                 });
 
@@ -479,17 +429,7 @@ function disp_rAF1pre_text() {
             requestAnimationFrame(function(stamp2) {
                 js_times.end_other = DT.now();
                 js_times.end_stamp = stamp2;
-                requestAnimationFrame(function(stamp3) {
-                    requestAnimationFrame(function(stamp4) {
-                        requestAnimationFrame(function(stamp5) {
-                            requestAnimationFrame(function(stamp6) {
-                                requestAnimationFrame(function(stamp7) {
-                                    store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                });
-                            });
-                        });
-                    });
-                });
+                store_trial();
             });
 
         }, current_stim.duration - d_buff);
@@ -521,17 +461,7 @@ function disp_rAF2pre_text() {
                     requestAnimationFrame(function(stamp2) {
                         js_times.end_other = DT.now();
                         js_times.end_stamp = stamp2;
-                        requestAnimationFrame(function(stamp3) {
-                            requestAnimationFrame(function(stamp4) {
-                                requestAnimationFrame(function(stamp5) {
-                                    requestAnimationFrame(function(stamp6) {
-                                        requestAnimationFrame(function(stamp7) {
-                                            store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                                        });
-                                    });
-                                });
-                            });
-                        });
+                        store_trial();
                     });
                 });
 
@@ -562,17 +492,7 @@ function disp_none_text() {
             js_times.end_nextline = DT.now();
             js_times.end_stamp = js_times.end_nextline;
             js_times.end_other = js_times.end_nextline;
-            requestAnimationFrame(function(stamp3) {
-                requestAnimationFrame(function(stamp4) {
-                    requestAnimationFrame(function(stamp5) {
-                        requestAnimationFrame(function(stamp6) {
-                            requestAnimationFrame(function(stamp7) {
-                                store_trial([stamp3, stamp4, stamp5, stamp6, stamp7].join('|'));
-                            });
-                        });
-                    });
-                });
-            });
+            store_trial();
         }, current_stim.duration - d_buff);
     });
 }
@@ -592,11 +512,10 @@ let full_data = [
     "js_start_stamp",
     "js_end_stamp",
     "js_start_other",
-    "js_end_other",
-    "js_endloop"
+    "js_end_other"
 ].join('\t') + '\n';
 
-function store_trial(prolog = 'NA') {
+function store_trial() {
     let c_item;
     c_item = current_stim.item.replace('./images/', '');
     full_data += [
@@ -612,8 +531,7 @@ function store_trial(prolog = 'NA') {
         js_times.start_stamp || 'NA',
         js_times.end_stamp || 'NA',
         js_times.start_other || 'NA',
-        js_times.end_other || 'NA',
-        prolog
+        js_times.end_other || 'NA'
     ].join('\t') + '\n';
     input_time = 'NA';
     if (allstims.length > 0) {
