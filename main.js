@@ -5,7 +5,7 @@ let use_images, date_time, jscd_text, listenkey, text_to_show, js_times,
 let trialnum = 0;
 let startclicked = false;
 let allimages = [];
-let d_buff = 10;
+let d_buff = 5;
 
 document.addEventListener("DOMContentLoaded", function() {
     let heads = ["os", "os_v", "browser", "browser_v", "screen"];
