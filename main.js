@@ -5,7 +5,7 @@ let use_images, date_time, jscd_text, listenkey, text_to_show, js_times,
 let trialnum = 0;
 let startclicked = false;
 let allimages = [];
-let d_buff = 5;
+let d_buff = 8;
 
 document.addEventListener("DOMContentLoaded", function() {
     let heads = ["os", "os_v", "browser", "browser_v", "screen"];
@@ -67,8 +67,8 @@ function stim_gen() {
         ];
     } else {
         methods = [
-            'rPAF_1rAF', 'rPAF_loop', 'rAFpre', 'rAFpre_double', 'rAFpre_loop',
-            'rAF_single', 'rAF_double', 'rAF_loop', 'none'
+            'rPAF_1rAF', 'rPAF_alone', 'rPAF_loop', 'rAFpre', 'rAFpre_double',
+            'rAFpre_loop', 'rAF_single', 'rAF_double', 'rAF_loop', 'none'
         ];
     }
     let types = {};
