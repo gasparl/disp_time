@@ -18,7 +18,7 @@ All files (for each "release") in this repository are permanently stored at http
 
 ---
 
-The contents of this repository are licensed under [CC-BY 4.0 International](https://github.com/gasparl/disp_time/blob/master/LICENSE.md).(In essence, you can use all material for any purpose as long as you give credit to the original authors in a reasonable manner, e.g. cite it in case of a publication; for details, see the included [LICENSE file](https://github.com/gasparl/disp_time/blob/master/LICENSE.md)).)
+The contents of this repository are licensed under [CC-BY 4.0 International](https://github.com/gasparl/disp_time/blob/master/LICENSE.md).(In essence, you can use all material for any purpose as long as you give credit to the original authors in a reasonable manner, e.g. cite it in case of a publication; for details, see the included [LICENSE file](https://github.com/gasparl/disp_time/blob/master/LICENSE.md).)
 
 An appropriate reference for citation is:
 
