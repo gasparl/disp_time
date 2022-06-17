@@ -22,7 +22,7 @@ The contents of this repository are licensed under [CC-BY 4.0 International](htt
 
 An appropriate reference for citation is:
 
-Lukács, G., & Gartus, A. (2022). _Precise display time measurement in JavaScript for web-based experiments._ https://psyarxiv.com/jqk8m/
+Lukács, G., & Gartus, A. (2022). Precise display time measurement in JavaScript for web-based experiments. _Behavior Research Methods_. https://doi.org/10.3758/s13428-022-01835-2
 
 ---
 
